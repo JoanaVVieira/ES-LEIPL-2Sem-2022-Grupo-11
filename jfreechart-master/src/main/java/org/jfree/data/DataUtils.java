@@ -235,6 +235,8 @@ public abstract class DataUtils {
      * @param data  the data ({@code null} not permitted).
      *
      * @return The cumulative percentages.
+     * 
+     * @param <K> an KeyValues
      */
     public static <K extends Comparable<K>> KeyedValues<K> getCumulativePercentages(KeyedValues<K> data) {
         Args.nullNotPermitted(data, "data");

@@ -42,7 +42,7 @@ import org.jfree.data.KeyedValues;
 /**
  * A general purpose dataset where values are associated with keys.  As the
  * name suggests, you can use this dataset to supply data for pie charts (refer
- * to the {@link org.jfree.chart.plot.PiePlot} class).
+ * to the {@link org.jfree.chart.plot.pie.PiePlot} class).
  * 
  * @param <K> Key type for KeyedValues
  */

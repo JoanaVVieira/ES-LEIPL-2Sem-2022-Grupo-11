@@ -44,9 +44,23 @@
 
 package org.jfree.data.xy;
 
+
+
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.swing.ChartPanel;
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.general.DatasetChangeListener;
 
@@ -204,55 +218,55 @@ public class XYDatasetTableModel extends AbstractTableModel
         }
     }
 
-//    /**
-//     * Run a demonstration of the table model interface.
-//     *
-//     * @param args  ignored.
-//     *
-//     * @throws Exception when an error occurs.
-//     */
-//    public static void main(String args[]) throws Exception {
-//        JFrame frame = new JFrame();
-//        JPanel panel = new JPanel();
-//        panel.setLayout(new BorderLayout());
-//
-//        XYSeries s1 = new XYSeries("Series 1", true, false);
-//        for (int i = 0; i < 10; i++) {
-//            s1.add(i, Math.random());
-//        }
-//        XYSeries s2 = new XYSeries("Series 2", true, false);
-//        for (int i = 0; i < 15; i++) {
-//            s2.add(i, Math.random());
-//        }
-//        DefaultTableXYDataset dataset = new DefaultTableXYDataset();
-//        dataset.addSeries(s1);
-//        dataset.addSeries(s2);
-//        XYDatasetTableModel tablemodel = new XYDatasetTableModel();
-//
-//        tablemodel.setModel(dataset);
-//
-//        JTable dataTable = new JTable(tablemodel);
-//        JScrollPane scroll = new JScrollPane(dataTable);
-//        scroll.setPreferredSize(new Dimension(600, 150));
-//
-//        JFreeChart chart = ChartFactory.createXYLineChart(
-//            "XY Series Demo",
-//            "X", "Y", dataset, PlotOrientation.VERTICAL,
-//            true,
-//            true,
-//            false
-//        );
-//
-//        ChartPanel chartPanel = new ChartPanel(chart);
-//
-//        panel.add(chartPanel, BorderLayout.CENTER);
-//        panel.add(scroll, BorderLayout.SOUTH);
-//
-//        frame.setContentPane(panel);
-//        frame.setSize(600, 500);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.show();
-//        RefineryUtilities.centerFrameOnScreen(frame);
-//    }
+    /**
+     * Run a demonstration of the table model interface.
+     *
+     * @param args  ignored.
+     *
+     * @throws Exception when an error occurs.
+     */
+    public static void main(String args[]) throws Exception {
+        JFrame frame = new JFrame();
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        XYSeries s1 = new XYSeries("Series 1", true, false);
+        for (int i = 0; i < 10; i++) {
+            s1.add(i, Math.random());
+        }
+        XYSeries s2 = new XYSeries("Series 2", true, false);
+        for (int i = 0; i < 15; i++) {
+            s2.add(i, Math.random());
+        }
+        DefaultTableXYDataset dataset = new DefaultTableXYDataset();
+        dataset.addSeries(s1);
+        dataset.addSeries(s2);
+        XYDatasetTableModel tablemodel = new XYDatasetTableModel();
+
+        tablemodel.setModel(dataset);
+
+        JTable dataTable = new JTable(tablemodel);
+        JScrollPane scroll = new JScrollPane(dataTable);
+        scroll.setPreferredSize(new Dimension(600, 150));
+
+        JFreeChart chart = ChartFactory.createXYLineChart(
+            "XY Series Demo",
+            "X", "Y", dataset, PlotOrientation.VERTICAL,
+            true,
+            true,
+            false
+        );
+
+        ChartPanel chartPanel = new ChartPanel(chart);
+
+        panel.add(chartPanel, BorderLayout.CENTER);
+        panel.add(scroll, BorderLayout.SOUTH);
+
+        frame.setContentPane(panel);
+        frame.setSize(600, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.show();
+      //  RefineryUtilities.centerFrameOnScreen(frame);
+    }
 
 }

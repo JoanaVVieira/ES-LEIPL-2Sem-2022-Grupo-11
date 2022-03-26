@@ -63,6 +63,7 @@ public class OHLCSeriesCollection extends AbstractXYDataset
     /** Storage for the data series. */
     private List data;
 
+    /** Time Period Anchor */
     private TimePeriodAnchor xPosition = TimePeriodAnchor.MIDDLE;
 
     /**
