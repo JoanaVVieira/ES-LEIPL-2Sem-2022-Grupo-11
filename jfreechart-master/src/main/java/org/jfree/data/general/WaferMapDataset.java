@@ -185,26 +185,6 @@ public class WaferMapDataset extends AbstractDataset {
     }
 
     /**
-     * Returns the value for a given chip x and y or null.
-     *
-     * @param chipx  the x-index.
-     * @param chipy  the y-index.
-     *
-     * @return The data value.
-     */
-    public Number getChipValue(Comparable chipx, Comparable chipy) {
-        int rowIndex = this.data.getRowIndex(chipx);
-        if (rowIndex < 0) {
-            return null;
-        }
-        int colIndex = this.data.getColumnIndex(chipy);
-        if (colIndex < 0) {
-            return null;
-        }
-        return this.data.getValue(rowIndex, colIndex);
-    }
-
-    /**
      * Tests to see if the passed value is larger than the stored maxvalue.
      *
      * @param check  the number to check.
