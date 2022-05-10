@@ -114,6 +114,7 @@ public class OHLCSeries<S extends Comparable<S>> extends ComparableObjectSeries<
      * 
      * @since 1.0.17
      */
+    
     public void add(OHLCItem item) {
         Args.nullNotPermitted(item, "item");
         add(item.getPeriod(), item.getOpenValue(), item.getHighValue(),
