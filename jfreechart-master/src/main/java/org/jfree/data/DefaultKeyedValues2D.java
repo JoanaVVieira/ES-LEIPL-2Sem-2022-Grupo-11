@@ -553,4 +553,23 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
         return clone;
     }
 
+	/**
+	 * Returns the value for a given chip x and y or null.
+	 * @param chipx   the x-index.
+	 * @param chipy   the y-index.
+	 * @param data
+	 * @return  The data value.
+	 */
+	public Number getChipValue(Comparable chipx, Comparable chipy, DefaultKeyedValues2D data) {
+		int rowIndex = data.getRowIndex(chipx);
+		if (rowIndex < 0) {
+			return null;
+		}
+		int colIndex = data.getColumnIndex(chipy);
+		if (colIndex < 0) {
+			return null;
+		}
+		return data.getValue(rowIndex, colIndex);
+	}
+
 }
