@@ -479,10 +479,10 @@ public class Month extends RegularTimePeriod implements Serializable {
             month = SerialDate.stringToMonthCode(s1);
         }
         if (month == -1) {
-            throw new TimePeriodFormatException("Can't evaluate the month.");
+            throw new IllegalArgumentException("Can't evaluate the month.");
         }
         if (year == null) {
-            throw new TimePeriodFormatException("Can't evaluate the year.");
+            throw new IllegalArgumentException("Can't evaluate the year.");
         }
         result = new Month(month, year);
         return result;
@@ -525,7 +525,7 @@ public class Month extends RegularTimePeriod implements Serializable {
         try {
             result = Year.parseYear(s);
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             // suppress
         }
         return result;

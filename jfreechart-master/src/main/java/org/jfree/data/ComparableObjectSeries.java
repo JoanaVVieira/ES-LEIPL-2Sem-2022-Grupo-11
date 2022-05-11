@@ -40,7 +40,6 @@ import org.jfree.chart.internal.Args;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.data.general.Series;
 import org.jfree.data.general.SeriesChangeEvent;
-import org.jfree.data.general.SeriesException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -230,7 +229,7 @@ public class ComparableObjectSeries<K extends Comparable<K>> extends Series<K>
                     }
                 }
                 else {
-                    throw new SeriesException("X-value already exists.");
+                    throw new RuntimeException("X-value already exists.");
                 }
             }
         }
@@ -240,7 +239,7 @@ public class ComparableObjectSeries<K extends Comparable<K>> extends Series<K>
                 // there is an item with the given x-value already
                 int index = indexOf(item.getComparable());
                 if (index >= 0) {
-                    throw new SeriesException("X-value already exists.");
+                    throw new RuntimeException("X-value already exists.");
                 }
             }
             this.data.add(item);
@@ -285,13 +284,13 @@ public class ComparableObjectSeries<K extends Comparable<K>> extends Series<K>
      * @param x  the x-value ({@code null} not permitted).
      * @param y  the y-value ({@code null} permitted).
      *
-     * @throws SeriesException if there is no existing item with the specified
+     * @throws RuntimeException if there is no existing item with the specified
      *         x-value.
      */
     protected void update(Comparable<?> x, Object y) {
         int index = indexOf(x);
         if (index < 0) {
-            throw new SeriesException("No observation for x = " + x);
+            throw new RuntimeException("No observation for x = " + x);
         }
         else {
             ComparableObjectItem item = getDataItem(index);

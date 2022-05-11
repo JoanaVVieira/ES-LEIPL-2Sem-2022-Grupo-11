@@ -552,7 +552,7 @@ public class Week extends RegularTimePeriod implements Serializable {
                 if (y != null) {
                     w = Week.stringToWeek(s2);
                     if (w == -1) {
-                        throw new TimePeriodFormatException(
+                        throw new IllegalArgumentException(
                                 "Can't evaluate the week.");
                     }
                     result = new Week(w, y);
@@ -562,20 +562,20 @@ public class Week extends RegularTimePeriod implements Serializable {
                     if (y != null) {
                         w = Week.stringToWeek(s1);
                         if (w == -1) {
-                            throw new TimePeriodFormatException(
+                            throw new IllegalArgumentException(
                                     "Can't evaluate the week.");
                         }
                         result = new Week(w, y);
                     }
                     else {
-                        throw new TimePeriodFormatException(
+                        throw new IllegalArgumentException(
                                 "Can't evaluate the year.");
                     }
                 }
 
             }
             else {
-                throw new TimePeriodFormatException(
+                throw new IllegalArgumentException(
                         "Could not find separator.");
             }
 
@@ -622,7 +622,7 @@ public class Week extends RegularTimePeriod implements Serializable {
         try {
             result = Year.parseYear(s);
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             // suppress
         }
         return result;

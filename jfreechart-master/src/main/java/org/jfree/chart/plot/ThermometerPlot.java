@@ -76,7 +76,6 @@ import org.jfree.chart.internal.SerialUtils;
 import org.jfree.chart.api.UnitType;
 import org.jfree.data.Range;
 import org.jfree.data.general.DatasetChangeEvent;
-import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.general.ValueDataset;
 
 /**
@@ -281,7 +280,6 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Creates a new thermometer plot.
      */
     public ThermometerPlot() {
-        this(new DefaultValueDataset());
     }
 
     /**

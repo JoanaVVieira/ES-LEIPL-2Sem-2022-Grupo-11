@@ -54,8 +54,8 @@ import org.jfree.chart.internal.Args;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.data.Range;
 import org.jfree.data.general.Series;
-import org.jfree.data.general.SeriesChangeEvent;
-import org.jfree.data.general.SeriesException;
+//import org.jfree.data.general.SeriesChangeEvent;
+//import org.jfree.data.general.RuntimeException;
 
 /**
  * Represents a sequence of zero or more data items in the form (period, value)
@@ -550,7 +550,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
             b.append(", but the TimeSeries is expecting an instance of ");
             b.append(this.timePeriodClass.getName());
             b.append(".");
-            throw new SeriesException(b.toString());
+            throw new RuntimeException(b.toString());
         }
 
         // make the change (if it's not a duplicate time period)...
@@ -580,7 +580,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
                     b.append(" but the series already contains an observation");
                     b.append(" for that time period. Duplicates are not ");
                     b.append("permitted.  Try using the addOrUpdate() method.");
-                    throw new SeriesException(b.toString());
+                    throw new RuntimeException(b.toString());
                 }
             }
         }
@@ -657,7 +657,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
 
     /**
      * Updates (changes) the value for a time period.  Throws a
-     * {@link SeriesException} if the period does not exist.
+     * {@link RuntimeException} if the period does not exist.
      *
      * @param period  the period ({@code null} not permitted).
      * @param value  the value.
@@ -670,7 +670,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
 
     /**
      * Updates (changes) the value for a time period.  Throws a
-     * {@link SeriesException} if the period does not exist.
+     * {@link RuntimeException} if the period does not exist.
      *
      * @param period  the period ({@code null} not permitted).
      * @param value  the value ({@code null} permitted).
@@ -679,7 +679,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
         TimeSeriesDataItem temp = new TimeSeriesDataItem(period, value);
         int index = Collections.binarySearch(this.data, temp);
         if (index < 0) {
-            throw new SeriesException("There is no existing value for the "
+            throw new RuntimeException("There is no existing value for the "
                     + "specified 'period'.");
         }
         update(index, value);
@@ -789,7 +789,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
                     + "period class is " + periodClass.getName()
                     + ", but the TimeSeries is expecting an instance of "
                     + this.timePeriodClass.getName() + ".";
-            throw new SeriesException(msg);
+            throw new RuntimeException(msg);
         }
         TimeSeriesDataItem overwritten = null;
         int index = Collections.binarySearch(this.data, item);
@@ -1034,7 +1034,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
                 try {
                     copy.add(clone);
                 }
-                catch (SeriesException e) {
+                catch (RuntimeException e) {
                     throw new RuntimeException(e);
                 }
             }

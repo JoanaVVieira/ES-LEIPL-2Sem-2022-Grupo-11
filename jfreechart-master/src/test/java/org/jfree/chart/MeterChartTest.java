@@ -47,7 +47,6 @@ import java.awt.image.BufferedImage;
 import org.jfree.chart.plot.MeterInterval;
 import org.jfree.chart.plot.MeterPlot;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -61,7 +60,7 @@ public class MeterChartTest  {
      */
     @Test
     public void testDrawWithNullInfo() {
-        MeterPlot plot = new MeterPlot(new DefaultValueDataset(60.0));
+        MeterPlot plot = new MeterPlot();
         plot.addInterval(new MeterInterval("Normal", new Range(0.0, 80.0)));
         JFreeChart chart = new JFreeChart(plot);
         BufferedImage image = new BufferedImage(200, 100,

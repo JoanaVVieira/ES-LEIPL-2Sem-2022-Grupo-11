@@ -47,7 +47,6 @@ import org.jfree.chart.internal.CloneUtils;
 import org.jfree.data.Range;
 import org.jfree.data.general.SeriesChangeEvent;
 import org.jfree.data.general.SeriesChangeListener;
-import org.jfree.data.general.SeriesException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -541,7 +540,7 @@ public class TimeSeriesTest implements SeriesChangeListener {
         try {
             s1.addOrUpdate(new Month(1, 2009), 0.0);
         }
-        catch (SeriesException e) {
+        catch (RuntimeException e) {
             pass = true;
         }
         assertTrue(pass);
