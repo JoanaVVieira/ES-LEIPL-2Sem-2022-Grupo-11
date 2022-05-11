@@ -265,7 +265,8 @@ public abstract class Regression {
         double sumX = 0.0;
         double sumY = 0.0;
 
-        for(int item = 0; item < validItems; item++){
+        double yRegSquare = yRegSquare(validItems, data, equations, coefficients, result, matrix, sumY);
+		for(int item = 0; item < validItems; item++){
             sumX += data[0][item];
             sumY += data[1][item];
             for(int eq = 0; eq < equations; eq++){
@@ -283,28 +284,67 @@ public abstract class Regression {
                 matrix[eq][coe] = subMatrix[eq - 1][coe - 1];
             }
         }
-        for (int eq = equations - 1; eq > -1; eq--) {
-            double value = matrix[eq][coefficients - 1];
-            for (int coe = eq; coe < coefficients -1; coe++) {
-                value -= matrix[eq][coe] * result[coe];
-            }
-            result[eq] = value / matrix[eq][eq];
-        }
-        double meanY = sumY / validItems;
-        double yObsSquare = 0.0;
-        double yRegSquare = 0.0;
-        for (int item = 0; item < validItems; item++) {
-            double yCalc = 0;
-            for (int eq = 0; eq < equations; eq++) {
-                yCalc += result[eq] * Math.pow(data[0][item],eq);
-            }
-            yRegSquare += Math.pow(yCalc - meanY, 2);
-            yObsSquare += Math.pow(data[1][item] - meanY, 2);
-        }
-        double rSquare = yRegSquare / yObsSquare;
+        double yObsSquare = yObsSquare(validItems, data, sumY);
+		double rSquare = yRegSquare / yObsSquare;
         result[equations] = rSquare;
         return result;
     }
+
+    /**
+     * Returns the squared error of Y observations.
+     *
+     * @param validItems  number of valid items.
+     * @param data  the x and y values from the series.
+     * @param sumY  sum of Y's.
+     *
+     * @return yObsSquare.
+     */
+	private static double yObsSquare(int validItems, double[][] data, double sumY) {
+		double meanY = sumY / validItems;
+		double yObsSquare = 0.0;
+		for (int item = 0; item < validItems; item++) {
+			yObsSquare += Math.pow(data[1][item] - meanY, 2);
+		}
+		return yObsSquare;
+	}
+
+	
+    /**
+     * Returns the squared error of Y polynomial regression.
+     *
+     * @param validItems  number of valid items.
+     * @param data  the x and y values from the series.
+     * @param equations the order of the function plus 1
+     * @param coefficients the order of the function plus 2
+     * @param result equation plus one size array
+     * @param matrix matrix with equation size rows and coefficient size columns
+     * @param sumY  sum of Y's.
+     *
+     * @return yRegSquare.
+     */
+	private static double yRegSquare(int validItems, double[][] data, int equations, int coefficients, double[] result,
+			double[][] matrix, double sumY) {
+		for (int item = 0; item < validItems; item++) {
+			sumY += data[1][item];
+		}
+		for (int eq = equations - 1; eq > -1; eq--) {
+			double value = matrix[eq][coefficients - 1];
+			for (int coe = eq; coe < coefficients - 1; coe++) {
+				value -= matrix[eq][coe] * result[coe];
+			}
+			result[eq] = value / matrix[eq][eq];
+		}
+		double meanY = sumY / validItems;
+		double yRegSquare = 0.0;
+		for (int item = 0; item < validItems; item++) {
+			double yCalc = 0;
+			for (int eq = 0; eq < equations; eq++) {
+				yCalc += result[eq] * Math.pow(data[0][item], eq);
+			}
+			yRegSquare += Math.pow(yCalc - meanY, 2);
+		}
+		return yRegSquare;
+	}
 
     /**
      * Returns a matrix with the following features: (1) the number of rows
@@ -332,17 +372,8 @@ public abstract class Regression {
         }
         // check for zero pivot element
         if (result[0][0] == 0) {
-            boolean found = false;
-            for (int i = 0; i < result.length; i ++) {
-                if (result[i][0] != 0) {
-                    found = true;
-                    double[] temp = result[0];
-                    System.arraycopy(result[i], 0, result[0], 0, 
-                            result[i].length);
-                    System.arraycopy(temp, 0, result[i], 0, temp.length);
-                    break;
-                }
-            }
+            boolean found = found(result);
+ 
             if (!found) {
                 //System.out.println("Equation has no solution!");
                 return new double[equations - 1][coefficients - 1];
@@ -357,5 +388,29 @@ public abstract class Regression {
         }
         return result;
     }
+
+    
+    /**
+     * Returns true when the method finds the first row i from the first column that is 
+     * different from 0. It swaps the first column with the ist row.
+     * 
+     * @param result  the matrix.
+     *
+     * @return found.
+     */
+	private static boolean found(double[][] result) {
+		boolean found = false;
+		for (int i = 0; i < result.length; i++) {
+			if (result[i][0] != 0) {
+				found = true;
+				double[] temp = result[0];
+                System.arraycopy(result[i], 0, result[0], 0, 
+                        result[i].length);
+                System.arraycopy(temp, 0, result[i], 0, temp.length);
+				break;
+			}
+		}
+		return found;
+	}
 
 }
