@@ -53,7 +53,6 @@ import java.util.List;
 import org.jfree.chart.api.PublicCloneable;
 
 import org.jfree.data.DefaultKeyedValues2D;
-import org.jfree.data.UnknownKeyException;
 import org.jfree.data.general.AbstractDataset;
 import org.jfree.data.general.DatasetChangeEvent;
 
@@ -212,7 +211,7 @@ public class DefaultCategoryDataset<R extends Comparable<R>, C extends Comparabl
      *
      * @return The value (possibly {@code null}).
      *
-     * @throws UnknownKeyException if either key is not defined in the dataset.
+     * @throws IllegalArgumentException if either key is not defined in the dataset.
      *
      * @see #addValue(Number, Comparable, Comparable)
      */
@@ -286,7 +285,7 @@ public class DefaultCategoryDataset<R extends Comparable<R>, C extends Comparabl
      * @param rowKey  the row key ({@code null} not permitted).
      * @param columnKey  the column key ({@code null} not permitted).
      *
-     * @throws UnknownKeyException if either key is not defined in the dataset.
+     * @throws IllegalArgumentException if either key is not defined in the dataset.
      */
     public void incrementValue(double value, R rowKey, C columnKey) {
         double existing = 0.0;
@@ -358,7 +357,7 @@ public class DefaultCategoryDataset<R extends Comparable<R>, C extends Comparabl
      *
      * @see #removeRow(Comparable)
      *
-     * @throws UnknownKeyException if {@code columnKey} is not defined
+     * @throws IllegalArgumentException if {@code columnKey} is not defined
      *         in the dataset.
      */
     public void removeColumn(C columnKey) {

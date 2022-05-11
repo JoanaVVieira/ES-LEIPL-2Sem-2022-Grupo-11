@@ -40,7 +40,6 @@ import java.util.Date;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-import org.jfree.data.UnknownKeyException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -156,7 +155,7 @@ public class SlidingGanttCategoryDatasetTest {
         boolean invalidRowKey = false;
         try {
             d1.getValue("Bad Value", "Task 1"); // Should be "Series", not "Bad Value"
-        } catch (UnknownKeyException e) {
+        } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("rowKey")) {
                 invalidRowKey = true;
             }
@@ -166,7 +165,7 @@ public class SlidingGanttCategoryDatasetTest {
         boolean invalidColumnKey = false;
         try {
             d1.getValue("Series", "Task 4"); // only three tasks!
-        } catch (UnknownKeyException e) {
+        } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("columnKey")) {
                 invalidColumnKey = true;
             }

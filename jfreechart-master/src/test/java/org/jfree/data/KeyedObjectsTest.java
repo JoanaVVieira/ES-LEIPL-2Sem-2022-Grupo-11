@@ -126,7 +126,7 @@ public class KeyedObjectsTest {
         try {
             data.getObject("Not a key");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -300,7 +300,7 @@ public class KeyedObjectsTest {
         try {
             ko1.removeValue("UNKNOWN");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

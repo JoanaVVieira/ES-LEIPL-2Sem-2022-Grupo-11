@@ -156,7 +156,7 @@ public class DefaultKeyedValues<K extends Comparable<K>>
      *
      * @return The value (possibly {@code null}).
      *
-     * @throws UnknownKeyException if the key is not recognised.
+     * @throws IllegalArgumentException if the key is not recognised.
      *
      * @see #getValue(int)
      */
@@ -164,7 +164,7 @@ public class DefaultKeyedValues<K extends Comparable<K>>
     public Number getValue(K key) {
         int index = getIndex(key);
         if (index < 0) {
-            throw new UnknownKeyException("Key not found: " + key);
+            throw new IllegalArgumentException("Key not found: " + key);
         }
         return getValue(index);
     }
@@ -305,12 +305,12 @@ public class DefaultKeyedValues<K extends Comparable<K>>
      *
      * @throws IllegalArgumentException if {@code key} is
      *     {@code null}.
-     * @throws UnknownKeyException if {@code key} is not recognised.
+     * @throws IllegalArgumentException if {@code key} is not recognised.
      */
     public void removeValue(K key) {
         int index = getIndex(key);
         if (index < 0) {
-            throw new UnknownKeyException("The key (" + key
+            throw new IllegalArgumentException("The key (" + key
                     + ") is not recognised.");
         }
         removeValue(index);

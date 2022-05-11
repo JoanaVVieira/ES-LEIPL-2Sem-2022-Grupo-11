@@ -46,7 +46,7 @@ import org.jfree.data.Range;
  * A range specified in terms of two {@code java.util.Date} objects.
  * Instances of this class are immutable.
  */
-public class DateRange implements Serializable {
+public class DateRange extends Range implements Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -4705682568375418157L;

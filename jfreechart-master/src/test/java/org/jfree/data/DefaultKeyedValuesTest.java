@@ -139,7 +139,7 @@ public class DefaultKeyedValuesTest {
         try {
             /* Number n = */ v2.getValue("KK");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -330,7 +330,7 @@ public class DefaultKeyedValuesTest {
         try {
             data.removeValue("XXX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

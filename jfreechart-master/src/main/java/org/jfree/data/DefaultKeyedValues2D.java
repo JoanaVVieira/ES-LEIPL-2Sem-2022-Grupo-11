@@ -230,7 +230,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
 
     /**
      * Returns the value for the given row and column keys.  This method will
-     * throw an {@link UnknownKeyException} if either key is not defined in the
+     * throw an {@link IllegalArgumentException} if either key is not defined in the
      * data structure.
      *
      * @param rowKey  the row key ({@code null} not permitted).
@@ -248,7 +248,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
 
         // check that the column key is defined in the 2D structure
         if (!(this.columnKeys.contains(columnKey))) {
-            throw new UnknownKeyException("Unrecognised columnKey: "
+            throw new IllegalArgumentException("Unrecognised columnKey: "
                     + columnKey);
         }
 
@@ -262,7 +262,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
             return (col >= 0 ? rowData.getValue(col) : null);
         }
         else {
-            throw new UnknownKeyException("Unrecognised rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unrecognised rowKey: " + rowKey);
         }
     }
 
@@ -399,7 +399,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
      * @see #removeRow(int)
      * @see #removeColumn(Comparable)
      *
-     * @throws UnknownKeyException if {@code rowKey} is not defined in the
+     * @throws IllegalArgumentException if {@code rowKey} is not defined in the
      *         table.
      */
     public void removeRow(R rowKey) {
@@ -409,7 +409,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
             removeRow(index);
         }
         else {
-            throw new UnknownKeyException("Unknown key: " + rowKey);
+            throw new IllegalArgumentException("Unknown key: " + rowKey);
         }
     }
 
@@ -431,7 +431,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
      *
      * @param columnKey  the column key ({@code null} not permitted).
      *
-     * @throws UnknownKeyException if the table does not contain a column with
+     * @throws IllegalArgumentException if the table does not contain a column with
      *     the specified key.
      * @throws IllegalArgumentException if {@code columnKey} is
      *     {@code null}.
@@ -442,7 +442,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
     public void removeColumn(C columnKey) {
         Args.nullNotPermitted(columnKey, "columnKey");
         if (!this.columnKeys.contains(columnKey)) {
-            throw new UnknownKeyException("Unknown key: " + columnKey);
+            throw new IllegalArgumentException("Unknown key: " + columnKey);
         }
         for (DefaultKeyedValues rowData : this.rows) {
             int index = rowData.getIndex(columnKey);

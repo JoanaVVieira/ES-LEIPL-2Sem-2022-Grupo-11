@@ -107,7 +107,7 @@ public interface KeyedValues2D<R extends Comparable<R>, C extends Comparable<C>>
      *
      * @return The value.
      *
-     * @throws UnknownKeyException if either key is not recognised.
+     * @throws IllegalArgumentException if either key is not recognised.
      */
     Number getValue(R rowKey, C columnKey);
 

@@ -42,7 +42,6 @@ import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
 
 import org.jfree.data.KeyedObjects2D;
-import org.jfree.data.UnknownKeyException;
 import org.jfree.data.category.IntervalCategoryDataset;
 /**
  * A test implementation of the {@link IntervalCategoryDataset} interface.
@@ -201,7 +200,7 @@ public class TestIntervalCategoryDataset<R extends Comparable<R>,
      *
      * @return The value (possibly {@code null}).
      *
-     * @throws UnknownKeyException if either key is not defined in the dataset.
+     * @throws IllegalArgumentException if either key is not defined in the dataset.
      *
      * @see #addValue(Number, Comparable, Comparable)
      */
@@ -341,7 +340,7 @@ public class TestIntervalCategoryDataset<R extends Comparable<R>,
      *
      * @see #removeRow(Comparable)
      *
-     * @throws UnknownKeyException if {@code columnKey} is not defined
+     * @throws IllegalArgumentException if {@code columnKey} is not defined
      *         in the dataset.
      */
     public void removeColumn(C columnKey) {

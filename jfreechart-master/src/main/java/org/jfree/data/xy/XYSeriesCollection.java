@@ -55,7 +55,6 @@ import org.jfree.data.DomainInfo;
 import org.jfree.data.DomainOrder;
 import org.jfree.data.Range;
 import org.jfree.data.RangeInfo;
-import org.jfree.data.UnknownKeyException;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.general.Series;
@@ -243,7 +242,7 @@ public class XYSeriesCollection<S extends Comparable<S>>
      *
      * @return The series with the specified key.
      *
-     * @throws UnknownKeyException if {@code key} is not found in the
+     * @throws IllegalArgumentException if {@code key} is not found in the
      *         collection.
      *
      * @since 1.0.9
@@ -255,7 +254,7 @@ public class XYSeriesCollection<S extends Comparable<S>>
                 return series;
             }
         }
-        throw new UnknownKeyException("Key not found: " + key);
+        throw new IllegalArgumentException("Key not found: " + key);
     }
 
     /**

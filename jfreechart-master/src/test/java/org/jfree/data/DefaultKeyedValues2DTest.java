@@ -59,7 +59,7 @@ public class DefaultKeyedValues2DTest {
         try {
             d.getValue("XX", "C1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -68,7 +68,7 @@ public class DefaultKeyedValues2DTest {
         try {
             d.getValue("R1", "XX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -315,7 +315,7 @@ public class DefaultKeyedValues2DTest {
         try {
             d.removeColumn("XXX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
