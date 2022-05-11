@@ -151,8 +151,8 @@ public class OHLCDataItem implements Comparable, Serializable {
      *
      * @return A boolean.
      */
-    @Override
-    public boolean equals(Object obj) {
+  //  @Override
+   /* public boolean equals(Object obj) {
         if (obj == this) {
             return true;
         }
@@ -177,7 +177,7 @@ public class OHLCDataItem implements Comparable, Serializable {
         }
         return true;
     }
-
+*/
     /**
      * Compares this object with the specified object for order. Returns a
      * negative integer, zero, or a positive integer as this object is less

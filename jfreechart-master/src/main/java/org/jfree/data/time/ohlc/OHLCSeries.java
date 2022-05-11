@@ -68,7 +68,7 @@ public class OHLCSeries<S extends Comparable<S>> extends ComparableObjectSeries<
      *
      * @return The time period.
      */
-    public RegularTimePeriod getPeriod(int index) {
+   /* public RegularTimePeriod getPeriod(int index) {
         OHLCItem item = (OHLCItem) getDataItem(index);
         return item.getPeriod();
     }
