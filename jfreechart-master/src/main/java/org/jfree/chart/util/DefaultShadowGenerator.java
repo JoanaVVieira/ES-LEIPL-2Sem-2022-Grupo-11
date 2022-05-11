@@ -203,76 +203,82 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
         int shadowRgb = this.shadowColor.getRGB() & 0x00FFFFFF;
 
         int[] aHistory = new int[this.shadowSize];
-        int historyIdx;
-
-        int aSum;
-
         int[] dataBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         int lastPixelOffset = right * dstWidth;
         float sumDivider = this.shadowOpacity / this.shadowSize;
 
         // horizontal pass
 
-        for (int y = 0, bufferOffset = 0; y < dstHeight; y++, bufferOffset = y * dstWidth) {
-            aSum = 0;
-            historyIdx = 0;
-            for (int x = 0; x < this.shadowSize; x++, bufferOffset++) {
-                int a = dataBuffer[bufferOffset] >>> 24;
-                aHistory[x] = a;
-                aSum += a;
-            }
-
-            bufferOffset -= right;
-
-            for (int x = xStart; x < xStop; x++, bufferOffset++) {
-                int a = (int) (aSum * sumDivider);
-                dataBuffer[bufferOffset] = a << 24 | shadowRgb;
-
-                // substract the oldest pixel from the sum
-                aSum -= aHistory[historyIdx];
-
-                // get the lastest pixel
-                a = dataBuffer[bufferOffset + right] >>> 24;
-                aHistory[historyIdx] = a;
-                aSum += a;
-
-                if (++historyIdx >= this.shadowSize) {
-                    historyIdx -= this.shadowSize;
-                }
-            }
-        }
-
-        // vertical pass
-        for (int x = 0, bufferOffset = 0; x < dstWidth; x++, bufferOffset = x) {
-            aSum = 0;
-            historyIdx = 0;
-            for (int y = 0; y < this.shadowSize; y++,
-                    bufferOffset += dstWidth) {
-                int a = dataBuffer[bufferOffset] >>> 24;
-                aHistory[y] = a;
-                aSum += a;
-            }
-
-            bufferOffset -= lastPixelOffset;
-
-            for (int y = yStart; y < yStop; y++, bufferOffset += dstWidth) {
-                int a = (int) (aSum * sumDivider);
-                dataBuffer[bufferOffset] = a << 24 | shadowRgb;
-
-                // substract the oldest pixel from the sum
-                aSum -= aHistory[historyIdx];
-
-                // get the lastest pixel
-                a = dataBuffer[bufferOffset + lastPixelOffset] >>> 24;
-                aHistory[historyIdx] = a;
-                aSum += a;
-
-                if (++historyIdx >= this.shadowSize) {
-                    historyIdx -= this.shadowSize;
-                }
-            }
-        }
+        aHistory = saveShadowPast(dstWidth, dstHeight, right, xStart, xStop, yStart, yStop, shadowRgb, aHistory,
+				 dataBuffer, lastPixelOffset, sumDivider);
     }
+
+    /**
+     * Gives the possibility of keeping the track of the shadow from an image.
+     *
+     * @param dstWidth image width
+     * @param dstHeight image height
+     * @param xStart x axis where the procedure will go through the shadow
+     * @param xStop x axis where the procedure will stop going through the shadow
+     * @param yStart y axis where the procedure will go through the shadow
+     * @param yStop y axis where the procedure will stop going through the shadow
+     * @param shadowRgb image's shadow tone
+     * @param aHistory return value initiliazed with the correct size
+     * @param dataBuffer buffer to help manipulating the shadow before returning it
+     * @param lastPixelOffset reference of the last pixel offset (x Axis) 
+     * @param sumDivider shadow tone factor
+     *
+     * @return an int array returning the shadow changed
+     */
+	private int[] saveShadowPast(int dstWidth, int dstHeight, int right, int xStart, int xStop, int yStart, int yStop,
+			int shadowRgb, int[] aHistory, int[] dataBuffer, int lastPixelOffset,
+			float sumDivider) {
+		int aSum = 0;
+		int historyIdx = 0;
+		for (int y = 0, bufferOffset = 0; y < dstHeight; y++, bufferOffset = y * dstWidth) {
+			aSum = 0;
+			historyIdx = 0;
+			for (int x = 0; x < this.shadowSize; x++, bufferOffset++) {
+				int a = dataBuffer[bufferOffset] >>> 24;
+				aHistory[x] = a;
+				aSum += a;
+			}
+			bufferOffset -= right;
+			for (int x = xStart; x < xStop; x++, bufferOffset++) {
+				int a = (int) (aSum * sumDivider);
+				dataBuffer[bufferOffset] = a << 24 | shadowRgb;
+				aSum -= aHistory[historyIdx];
+				a = dataBuffer[bufferOffset + right] >>> 24;
+				aHistory[historyIdx] = a;
+				aSum += a;
+				if (++historyIdx >= this.shadowSize) {
+					historyIdx -= this.shadowSize;
+				}
+			}
+		}
+		for (int x = 0, bufferOffset = 0; x < dstWidth; x++, bufferOffset = x) {
+			aSum = 0;
+			historyIdx = 0;
+			for (int y = 0; y < this.shadowSize; y++, bufferOffset += dstWidth) {
+				int a = dataBuffer[bufferOffset] >>> 24;
+				aHistory[y] = a;
+				aSum += a;
+			}
+			bufferOffset -= lastPixelOffset;
+			for (int y = yStart; y < yStop; y++, bufferOffset += dstWidth) {
+				int a = (int) (aSum * sumDivider);
+				dataBuffer[bufferOffset] = a << 24 | shadowRgb;
+				aSum -= aHistory[historyIdx];
+				a = dataBuffer[bufferOffset + lastPixelOffset] >>> 24;
+				aHistory[historyIdx] = a;
+				aSum += a;
+				if (++historyIdx >= this.shadowSize) {
+					historyIdx -= this.shadowSize;
+				}
+			}
+		}
+		return aHistory;
+	}
 
     /**
      * Tests this object for equality with an arbitrary object.
