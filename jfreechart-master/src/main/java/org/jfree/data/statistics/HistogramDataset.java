@@ -161,11 +161,8 @@ public class HistogramDataset extends AbstractIntervalXYDataset
         for (int i = 0; i < values.length; i++) {
             int binIndex = bins - 1;
             if (values[i] < maximum) {
-                double fraction = (values[i] - minimum) / (maximum - minimum);
-                if (fraction < 0.0) {
-                    fraction = 0.0;
-                }
-                binIndex = (int) (fraction * bins);
+                double fraction = fraction(values, minimum, maximum, i);
+				binIndex = (int) (fraction * bins);
                 // rounding could result in binIndex being equal to bins
                 // which will cause an IndexOutOfBoundsException - see bug
                 // report 1553088
@@ -185,6 +182,24 @@ public class HistogramDataset extends AbstractIntervalXYDataset
         this.list.add(map);
         fireDatasetChanged();
     }
+
+    /**
+     * Returns fraction if the result is positive and 0 if negative.
+     *
+     * @param values  the raw observations.
+     * @param minimum  the lower bound of the bin range.
+     * @param maximum  the upper bound of the bin range.
+     * @param i  position in the matrix.
+     *
+     * @return The fraction result.
+     */
+	private double fraction(double[] values, double minimum, double maximum, int i) {
+		double fraction = (values[i] - minimum) / (maximum - minimum);
+		if (fraction < 0.0) {
+			fraction = 0.0;
+		}
+		return fraction;
+	}
 
     /**
      * Returns the minimum value in an array of values.
