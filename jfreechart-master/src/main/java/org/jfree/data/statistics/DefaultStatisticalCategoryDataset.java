@@ -374,14 +374,10 @@ public class DefaultStatisticalCategoryDataset<R extends Comparable<R>,
         this.data.addObject(item, rowKey, columnKey);
 
         double m = Double.NaN;
-        double sd = Double.NaN;
-        if (mean != null) {
+        double sd = stdeviation(standardDeviation);
+		if (mean != null) {
             m = mean.doubleValue();
         }
-        if (standardDeviation != null) {
-            sd = standardDeviation.doubleValue();
-        }
-
         // update cached range values
         int r = this.data.getColumnIndex(columnKey);
         int c = this.data.getRowIndex(rowKey);
@@ -436,6 +432,21 @@ public class DefaultStatisticalCategoryDataset<R extends Comparable<R>,
         }
         fireDatasetChanged();
     }
+
+    /**
+     * Converts the standard deviation in a double.
+     *
+     * @param standardDeviation  the standard deviation.
+     * 
+     * @return sd the standard deviation converted
+     */
+	private double stdeviation(Number standardDeviation) {
+		double sd = Double.NaN;
+		if (standardDeviation != null) {
+			sd = standardDeviation.doubleValue();
+		}
+		return sd;
+	}
 
     /**
      * Removes an item from the dataset and sends a {@link DatasetChangeEvent}
