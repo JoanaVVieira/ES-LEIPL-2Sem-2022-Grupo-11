@@ -62,7 +62,9 @@ public class HistogramDataset extends AbstractIntervalXYDataset
         implements IntervalXYDataset, Cloneable, PublicCloneable,
                    Serializable {
 
-    /** For serialization. */
+    private transient HistogramDatasetProduct histogramDatasetProduct = new HistogramDatasetProduct();
+
+	/** For serialization. */
     private static final long serialVersionUID = -6341668077370231153L;
 
     /** A list of maps. */
@@ -110,10 +112,7 @@ public class HistogramDataset extends AbstractIntervalXYDataset
      * @param bins  the number of bins (must be at least 1).
      */
     public void addSeries(Comparable key, double[] values, int bins) {
-        // defer argument checking...
-        double minimum = getMinimum(values);
-        double maximum = getMaximum(values);
-        addSeries(key, values, bins, minimum, maximum);
+        histogramDatasetProduct.addSeries(key, values, bins, this);
     }
 
     /**
@@ -200,50 +199,6 @@ public class HistogramDataset extends AbstractIntervalXYDataset
 		}
 		return fraction;
 	}
-
-    /**
-     * Returns the minimum value in an array of values.
-     *
-     * @param values  the values ({@code null} not permitted and
-     *                zero-length array not permitted).
-     *
-     * @return The minimum value.
-     */
-    private double getMinimum(double[] values) {
-        if (values == null || values.length < 1) {
-            throw new IllegalArgumentException(
-                    "Null or zero length 'values' argument.");
-        }
-        double min = Double.MAX_VALUE;
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] < min) {
-                min = values[i];
-            }
-        }
-        return min;
-    }
-
-    /**
-     * Returns the maximum value in an array of values.
-     *
-     * @param values  the values ({@code null} not permitted and
-     *                zero-length array not permitted).
-     *
-     * @return The maximum value.
-     */
-    private double getMaximum(double[] values) {
-        if (values == null || values.length < 1) {
-            throw new IllegalArgumentException(
-                    "Null or zero length 'values' argument.");
-        }
-        double max = -Double.MAX_VALUE;
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] > max) {
-                max = values[i];
-            }
-        }
-        return max;
-    }
 
     /**
      * Returns the bins for a series.
@@ -503,6 +458,7 @@ public class HistogramDataset extends AbstractIntervalXYDataset
     @Override
     public Object clone() throws CloneNotSupportedException {
         HistogramDataset clone = (HistogramDataset) super.clone();
+		clone.histogramDatasetProduct = (HistogramDatasetProduct) this.histogramDatasetProduct.clone();
         int seriesCount = getSeriesCount();
         clone.list = new ArrayList<>(seriesCount);
         for (int i = 0; i < seriesCount; i++) {
@@ -510,5 +466,4 @@ public class HistogramDataset extends AbstractIntervalXYDataset
         }
         return clone;
     }
-
 }

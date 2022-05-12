@@ -361,11 +361,8 @@ public class DynamicTimeSeriesCollection extends AbstractIntervalXYDataset
             throw new IllegalArgumentException("TimeSeriesDataset.addSeries(): "
                 + "cannot add more series than specified in c'tor");
         }
-        if (this.valueHistory[seriesNumber] == null) {
-            this.valueHistory[seriesNumber]
-                = new ValueSequence(this.historyCount);
-            this.seriesCount++;
-        }
+        
+        overwriteValueHistory(seriesNumber);
         // But if that series array already exists, just overwrite its contents
 
         // Avoid IndexOutOfBoundsException:
@@ -376,23 +373,44 @@ public class DynamicTimeSeriesCollection extends AbstractIntervalXYDataset
             fillNeeded = true;
             copyLength = srcLength;
         }
-        //{
         for (i = 0; i < copyLength; i++) { // deep copy from values[], caller
                                            // can safely discard that array
-            this.valueHistory[seriesNumber].enterData(i, values[i]);
+        	addValueHistory(seriesNumber, i, values[i]);
         }
         if (fillNeeded) {
             for (i = copyLength; i < this.historyCount; i++) {
-                this.valueHistory[seriesNumber].enterData(i, 0.0f);
+            	addValueHistory(seriesNumber, i, 0.0f);
             }
         }
-      //}
         if (seriesKey != null) {
-            this.seriesKeys[seriesNumber] = seriesKey;
+        	setSeriesKey(seriesNumber, seriesKey);
         }
         fireSeriesChanged();
+    }   
+     
+    /**
+     * Overwrite the contents of valueHistory for a given series
+     * 
+     * @param seriesNumber the series index (zero-based).
+     */
+    public void overwriteValueHistory(int seriesNumber) {
+        if (this.valueHistory[seriesNumber] == null) {
+            this.valueHistory[seriesNumber] = new ValueSequence(this.historyCount);
+            this.seriesCount++;
+        }
     }
 
+    /**
+     * Add series values ​​for a given seriesNumber.
+     * 
+     * @param seriesNumber the series index (zero-based).
+     * @param index  the history array index.
+     * @param values  the series values.
+     */
+    public void addValueHistory(int seriesNumber, int index, float values) {
+    	this.valueHistory[seriesNumber].enterData(index, values);
+    }
+    
     /**
      * Sets the name of a series.  If planning to add values individually.
      *
@@ -418,15 +436,11 @@ public class DynamicTimeSeriesCollection extends AbstractIntervalXYDataset
                 + seriesNumber + "unspecified in c'tor"
             );
         }
-        if (this.valueHistory[seriesNumber] == null) {
-            this.valueHistory[seriesNumber]
-                = new ValueSequence(this.historyCount);
-            this.seriesCount++;
-        }
+        overwriteValueHistory(seriesNumber);
         // But if that series array already exists, just overwrite its contents
         //synchronized(this)
         //{
-            this.valueHistory[seriesNumber].enterData(index, value);
+        addValueHistory(seriesNumber, index, value);
         //}
         fireSeriesChanged();
     }
@@ -527,26 +541,9 @@ public class DynamicTimeSeriesCollection extends AbstractIntervalXYDataset
     public synchronized RegularTimePeriod advanceTime() {
         RegularTimePeriod nextInstant = this.pointsInTime[this.newestAt].next();
         this.newestAt = this.oldestAt;  // newestAt takes value previously held
-                                        // by oldestAT
-        /***
-         * The next 10 lines or so should be expanded if data can be negative
-         ***/
-        // if the oldest data contained a maximum Y-value, invalidate the stored
-        //   Y-max and Y-range data:
-        boolean extremaChanged = false;
-        float oldMax = 0.0f;
-        if (this.maxValue != null) {
-            oldMax = this.maxValue;
-        }
-        for (int s = 0; s < getSeriesCount(); s++) {
-            if (this.valueHistory[s].getData(this.oldestAt) == oldMax) {
-                extremaChanged = true;
-            }
-            if (extremaChanged) {
-                break;
-            }
-        }  /*** If data can be < 0, add code here to check the minimum    **/
-        if (extremaChanged) {
+        
+        boolean extremaChanged = extremaChanged();
+		if (extremaChanged) {
             invalidateRangeInfo();
         }
         //  wipe the next (about to be used) set of data slots
@@ -570,6 +567,28 @@ public class DynamicTimeSeriesCollection extends AbstractIntervalXYDataset
         fireSeriesChanged();
         return nextInstant;
     }
+
+    /**
+     * Validates the range info. If invalid returns true.
+     *
+     * @return The range is valid as {@code boolean}
+     */
+	private boolean extremaChanged() {
+		boolean extremaChanged = false;
+		float oldMax = 0.0f;
+		if (this.maxValue != null) {
+			oldMax = this.maxValue;
+		}
+		for (int s = 0; s < getSeriesCount(); s++) {
+			if (this.valueHistory[s].getData(this.oldestAt) == oldMax) {
+				extremaChanged = true;
+			}
+			if (extremaChanged) {
+				break;
+			}
+		}
+		return extremaChanged;
+	}
 
     //  If data can be < 0, the next 2 methods should be modified
 
@@ -703,7 +722,7 @@ public class DynamicTimeSeriesCollection extends AbstractIntervalXYDataset
     @Override
     public Number getX(int series, int item) {
         RegularTimePeriod tp = this.pointsInTime[translateGet(item)];
-        return tp.getX(position, workingCalendar);
+        return getX(tp);
     }
 
     /**
@@ -868,7 +887,25 @@ public class DynamicTimeSeriesCollection extends AbstractIntervalXYDataset
         return this.domainRange;
     }
 
-    
+    /**
+     * Returns the x-value for a time period.
+     *
+     * @param period  the period.
+     *
+     * @return The x-value.
+     */
+    private long getX(RegularTimePeriod period) {
+        switch (this.position) {
+            case (START) :
+                return period.getFirstMillisecond(this.workingCalendar);
+            case (MIDDLE) :
+                return period.getMiddleMillisecond(this.workingCalendar);
+            case (END) :
+                return period.getLastMillisecond(this.workingCalendar);
+            default:
+                return period.getMiddleMillisecond(this.workingCalendar);
+        }
+     }
 
     // The next 3 functions implement the RangeInfo interface.
     // Using saved limits (updated by each updateTime() call) significantly

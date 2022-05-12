@@ -200,6 +200,16 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
     public double getMaxY() {
         return this.maxY;
     }
+    
+    /**
+     * Updates the minimum and maximum y-values.
+     *
+     * @param yy  the data item value.
+     */
+    public void updateMinMaxY(double yy) {
+	    this.minY = minIgnoreNaN(this.minY, yy);
+	    this.maxY = maxIgnoreNaN(this.maxY, yy);
+    }
 
     /**
      * Updates the cached values for the minimum and maximum data values.
@@ -228,21 +238,11 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
      * @since 1.0.13
      */
     private void updateBoundsForRemovedItem(XYDataItem item) {
-        boolean itemContributesToXBounds = false;
+        boolean itemContributesToXBounds = itemContributesToBounds(item.getXValue(), this.minX, this.maxX);
         boolean itemContributesToYBounds = false;
-        double x = item.getXValue();
-        if (!Double.isNaN(x)) {
-            if (x <= this.minX || x >= this.maxX) {
-                itemContributesToXBounds = true;
-            }
-        }
+
         if (item.getY() != null) {
-            double y = item.getYValue();
-            if (!Double.isNaN(y)) {
-                if (y <= this.minY || y >= this.maxY) {
-                    itemContributesToYBounds = true;
-                }
-            }
+        	itemContributesToYBounds = itemContributesToBounds(item.getYValue(), this.minY, this.maxY);
         }
         if (itemContributesToYBounds) {
             findBoundsByIteration();
@@ -474,12 +474,8 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
             else {
                 if (this.allowDuplicateXValues) {
                     // need to make sure we are adding *after* any duplicates
-                    int size = this.data.size();
-                    while (index < size && item.compareTo(
-                            this.data.get(index)) == 0) {
-                        index++;
-                    }
-                    if (index < this.data.size()) {
+                    index = index(item, index);
+					if (index < this.data.size()) {
                         this.data.add(index, item);
                     }
                     else {
@@ -511,6 +507,22 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
             fireSeriesChanged();
         }
     }
+
+    /**
+     * Get the last index of the data item list.
+     *
+     * @param item  the (x, y) item ({@code null} not permitted).
+     * @param index the index of the search item.
+     * 
+     * @return the index.
+     */
+	private int index(XYDataItem item, int index) {
+        int size = this.data.size();
+		while (index < size && item.compareTo(this.data.get(index)) == 0) {
+			index++;
+		}
+		return index;
+	}
 
     /**
      * Deletes a range of items from the series and sends a
@@ -667,11 +679,7 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
         XYDataItem item = getRawDataItem(index);
 
         // figure out if we need to iterate through all the y-values
-        boolean iterate = false;
-        double oldY = item.getYValue();
-        if (!Double.isNaN(oldY)) {
-            iterate = oldY <= this.minY || oldY >= this.maxY;
-        }
+        boolean iterate = itemContributesToBounds(item.getYValue(), this.minY, this.maxY);
         item.setY(y);
 
         if (iterate) {
@@ -757,20 +765,13 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
             XYDataItem existing = this.data.get(index);
             overwritten = (XYDataItem) existing.clone();
             // figure out if we need to iterate through all the y-values
-            boolean iterate = false;
-            double oldY = existing.getYValue();
-            if (!Double.isNaN(oldY)) {
-                iterate = oldY <= this.minY || oldY >= this.maxY;
-            }
+            boolean iterate = itemContributesToBounds(existing.getYValue(), this.minY, this.maxY);
             existing.setY(item.getY());
-
             if (iterate) {
                 findBoundsByIteration();
             }
             else if (item.getY() != null) {
-                double yy = item.getY().doubleValue();
-                this.minY = minIgnoreNaN(this.minY, yy);
-                this.maxY = maxIgnoreNaN(this.maxY, yy);
+            	updateMinMaxY(item.getY().doubleValue());
             }
         }
         else {

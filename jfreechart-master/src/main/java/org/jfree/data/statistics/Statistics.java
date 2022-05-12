@@ -395,23 +395,33 @@ public abstract class Statistics {
         double sumY2 = 0.0;
         double sumXY = 0.0;
         for (int i = 0; i < n; i++) {
-            double x = 0.0;
-            if (data1[i] != null) {
-                x = data1[i].doubleValue();
-            }
-            double y = 0.0;
-            if (data2[i] != null) {
-                y = data2[i].doubleValue();
-            }
+            double x = doubleValue(data1, i);
+            double y = doubleValue(data2, i);
+
             sumX = sumX + x;
             sumY = sumY + y;
             sumXY = sumXY + (x * y);
             sumX2 = sumX2 + (x * x);
             sumY2 = sumY2 + (y * y);
         }
-        return (n * sumXY - sumX * sumY) / Math.pow((n * sumX2 - sumX * sumX)
-                * (n * sumY2 - sumY * sumY), 0.5);
+        double covariance = (n * sumXY - sumX * sumY);
+        double stdv = Math.pow((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY), 0.5);
+        
+        return  covariance / stdv;
     }
+    
+    /**
+    * Returns the value of data ​​for a given index as a {@code double}.
+    *
+    * @return  the numeric as a {@code double}
+    */
+	private static double doubleValue(Number[] data, int i) {
+		double value = 0.0;
+		if (data[i] != null) {
+			value = data[i].doubleValue();
+		}
+		return value;
+	}   
 
     /**
      * Returns a data set for a moving average on the data set passed in.
