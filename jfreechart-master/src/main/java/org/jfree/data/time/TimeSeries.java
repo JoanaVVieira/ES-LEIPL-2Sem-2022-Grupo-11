@@ -696,19 +696,14 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
         boolean iterate = false;
         Number oldYN = item.getValue();
         if (oldYN != null) {
-            double oldY = oldYN.doubleValue();
-            if (!Double.isNaN(oldY)) {
-                iterate = oldY <= this.minY || oldY >= this.maxY;
-            }
+            iterate = itemContributesToBounds(oldYN.doubleValue(), this.minY, this.maxY);
         }
         item.setValue(value);
         if (iterate) {
             updateMinMaxYByIteration();
         }
-        else if (value != null) {
-            double yy = value.doubleValue();
-            this.minY = minIgnoreNaN(this.minY, yy);
-            this.maxY = maxIgnoreNaN(this.maxY, yy);
+        else if (value != null) {            
+        	updateMinMaxY(value.doubleValue());
         }
         fireSeriesChanged();
     }
@@ -798,20 +793,15 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
             overwritten = (TimeSeriesDataItem) existing.clone();
             // figure out if we need to iterate through all the y-values
             // to find the revised minY / maxY
-            boolean iterate = false;
             Number oldYN = existing.getValue();
             double oldY = oldYN != null ? oldYN.doubleValue() : Double.NaN;
-            if (!Double.isNaN(oldY)) {
-                iterate = oldY <= this.minY || oldY >= this.maxY;
-            }
+            boolean iterate = itemContributesToBounds(oldY, this.minY, this.maxY);
             existing.setValue(item.getValue());
             if (iterate) {
                 updateMinMaxYByIteration();
             }
             else if (item.getValue() != null) {
-                double yy = item.getValue().doubleValue();
-                this.minY = minIgnoreNaN(this.minY, yy);
-                this.maxY = maxIgnoreNaN(this.maxY, yy);
+            	updateMinMaxY(item.getValue().doubleValue());
             }
         }
         else {
@@ -1163,9 +1153,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     private void updateBoundsForAddedItem(TimeSeriesDataItem item) {
         Number yN = item.getValue();
         if (item.getValue() != null) {
-            double y = yN.doubleValue();
-            this.minY = minIgnoreNaN(this.minY, y);
-            this.maxY = maxIgnoreNaN(this.maxY, y);
+        	updateMinMaxY(yN.doubleValue());
         }
     }
     
@@ -1187,6 +1175,16 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
                 }
             }
         }
+    }
+    
+    /**
+     * Updates the minimum and maximum y-values.
+     *
+     * @param yy  the data item value.
+     */
+    public void updateMinMaxY(double yy) {
+	    this.minY = minIgnoreNaN(this.minY, yy);
+	    this.maxY = maxIgnoreNaN(this.maxY, yy);
     }
 
     /**
