@@ -85,9 +85,9 @@ public abstract class BoxAndWhiskerCalculator {
 
         Args.nullNotPermitted(values, "values");
 
-        List vlist;
-        if (stripNullAndNaNItems) {
-            vlist = new ArrayList(values.size());
+        double maxOutlier = maxOutlier(values, stripNullAndNaNItems);
+		List vlist = samplingData(values, stripNullAndNaNItems);
+		if (stripNullAndNaNItems) {
             for (Object obj : values) {
                 if (obj instanceof Number) {
                     Number n = (Number) obj;
@@ -99,7 +99,6 @@ public abstract class BoxAndWhiskerCalculator {
             }
         }
         else {
-            vlist = values;
         }
         Collections.sort(vlist);
 
@@ -113,23 +112,20 @@ public abstract class BoxAndWhiskerCalculator {
         double upperOutlierThreshold = q3 + (interQuartileRange * 1.5);
         double lowerOutlierThreshold = q1 - (interQuartileRange * 1.5);
 
-        double upperFaroutThreshold = q3 + (interQuartileRange * 2.0);
         double lowerFaroutThreshold = q1 - (interQuartileRange * 2.0);
 
         double minRegularValue = Double.POSITIVE_INFINITY;
         double maxRegularValue = Double.NEGATIVE_INFINITY;
         double minOutlier = Double.POSITIVE_INFINITY;
-        double maxOutlier = Double.NEGATIVE_INFINITY;
         List<Number> outliers = new ArrayList<>();
 
         for (Object o : vlist) {
-            Number number = (Number) o;
+            maxRegularValue = maxRegularValue(upperOutlierThreshold, lowerOutlierThreshold, maxRegularValue, o);
+			minRegularValue = minRegularValue(upperOutlierThreshold, lowerOutlierThreshold, minRegularValue, o);
+			Number number = (Number) o;
             double value = number.doubleValue();
             if (value > upperOutlierThreshold) {
                 outliers.add(number);
-                if (value > maxOutlier && value <= upperFaroutThreshold) {
-                    maxOutlier = value;
-                }
             }
             else if (value < lowerOutlierThreshold) {
                 outliers.add(number);
@@ -138,17 +134,110 @@ public abstract class BoxAndWhiskerCalculator {
                 }
             }
             else {
-                minRegularValue = Math.min(minRegularValue, value);
-                maxRegularValue = Math.max(maxRegularValue, value);
             }
             minOutlier = Math.min(minOutlier, minRegularValue);
-            maxOutlier = Math.max(maxOutlier, maxRegularValue);
         }
 
         return new BoxAndWhiskerItem(mean, median, q1, q3, minRegularValue,
                 maxRegularValue, minOutlier, maxOutlier, outliers);
 
     }
+
+    /**
+     * Inside a sample, returns the minimum regular value
+     *
+     * @param upperOutlierThreshold  maximum of a non regular value
+     * @param lowerOutlierThreshold minimum of a non regular value
+     * @param lowerOutlierThreshold max regular value before testing it
+     * @param o NaN to check it's value
+     *
+     * @return return the minimum regular value from a sample
+     */
+	private static double minRegularValue(double upperOutlierThreshold, double lowerOutlierThreshold,
+			double minRegularValue, Object o) {
+		Number number = (Number) o;
+		double value = number.doubleValue();
+		if (value > upperOutlierThreshold) {
+		} else if (value < lowerOutlierThreshold) {
+		} else {
+			minRegularValue = Math.min(minRegularValue, value);
+		}
+		return minRegularValue;
+	}
+
+    /**
+     * From a sample, calculates it's maximum outlier
+     * 
+     * @param values  a list of numbers (a {@code null} list is not
+     *                permitted) from a sample
+     * @param stripNullAndNaNItems  a flag that controls the handling of null
+     *     and NaN items.
+     *
+     * @return the max outlier from the sample given
+     */
+	private static double maxOutlier(List<? extends Number> values, boolean stripNullAndNaNItems) {
+		List vlist = samplingData(values, stripNullAndNaNItems);
+		double q1 = calculateQ1(vlist);
+		double q3 = calculateQ3(vlist);
+		double interQuartileRange = q3 - q1;
+		double upperOutlierThreshold = q3 + (interQuartileRange * 1.5);
+		double lowerOutlierThreshold = q1 - (interQuartileRange * 1.5);
+		double upperFaroutThreshold = q3 + (interQuartileRange * 2.0);
+		double maxRegularValue = Double.NEGATIVE_INFINITY;
+		double maxOutlier = Double.NEGATIVE_INFINITY;
+		for (Object o : vlist) {
+			maxRegularValue = maxRegularValue(upperOutlierThreshold, lowerOutlierThreshold, maxRegularValue, o);
+			Number number = (Number) o;
+			double value = number.doubleValue();
+			if (value > upperOutlierThreshold) {
+				if (value > maxOutlier && value <= upperFaroutThreshold) {
+					maxOutlier = value;
+				}
+			}
+			maxOutlier = Math.max(maxOutlier, maxRegularValue);
+		}
+		return maxOutlier;
+	}
+
+    /**
+     * Inside a sample, returns the maximum regular value
+     *
+     * @param upperOutlierThreshold  maximum of a non regular value
+     * @param lowerOutlierThreshold minimum of a non regular value
+     * @param lowerOutlierThreshold max regular value before testing it
+     * @param o NaN to check it's value
+     *
+     * @return return the max regular value from a sample
+     */
+	private static double maxRegularValue(double upperOutlierThreshold, double lowerOutlierThreshold,
+			double maxRegularValue, Object o) {
+		Number number = (Number) o;
+		double value = number.doubleValue();
+		if (value > upperOutlierThreshold) {
+		} else if (value < lowerOutlierThreshold) {
+		} else {
+			maxRegularValue = Math.max(maxRegularValue, value);
+		}
+		return maxRegularValue;
+	}
+
+    /**
+     * Helper to get the sample that we want to work in
+     *
+     * @param values  parameter that allows us to validate the List
+     * @param stripNullAndNaNItems parameter that tells us if we want to evaluate stripping
+     *
+     * @return return the sample list to work on
+     */
+	private static List samplingData(List<? extends Number> values, boolean stripNullAndNaNItems) {
+		List vlist;
+		if (stripNullAndNaNItems) {
+			vlist = new ArrayList(values.size());
+		} else {
+			vlist = values;
+		}
+		return vlist;
+	}
 
     /**
      * Calculates the first quartile for a list of numbers in ascending order.

@@ -147,50 +147,63 @@ public class JSONUtils {
             throws IOException {
         Args.nullNotPermitted(data, "data");
         Args.nullNotPermitted(writer, "writer");
-        List<Comparable<?>> columnKeys = data.getColumnKeys();
-        List<Comparable<?>> rowKeys = data.getRowKeys();
-        writer.write("{");
-        if (!columnKeys.isEmpty()) {
-            writer.write("\"columnKeys\": [");
-            boolean first = true;
-            for (Comparable<?> columnKey : columnKeys) {
-                if (!first) {
-                    writer.write(", ");
-                } else {
-                    first = false;
-                }
-                writer.write(JSONValue.toJSONString(columnKey.toString()));
-            }
-            writer.write("]");
-        }
-        if (!rowKeys.isEmpty()) {
-            writer.write(", \"rows\": [");
-            boolean firstRow = true;
-            for (Comparable<?> rowKey : rowKeys) {   
-                if (!firstRow) {
-                    writer.write(", [");
-                } else {
-                    writer.write("[");
-                    firstRow = false;
-                }
-                // write the row data 
-                writer.write(JSONValue.toJSONString(rowKey.toString()));
-                writer.write(", [");
-                boolean first = true;
-                for (Comparable<?> columnKey : columnKeys) {
-                    if (!first) {
-                        writer.write(", ");
-                    } else {
-                        first = false;
-                    }
-                    writer.write(JSONValue.toJSONString(data.getValue(rowKey, 
-                            columnKey)));
-                }
-                writer.write("]]");
-            }
-            writer.write("]");
-        }
-        writer.write("}");    
+        writingTool(data, writer);    
     }
+
+    
+    /**
+     * It's the method that actually writes into the writer asked
+     * Note that this method can be used with instances of 
+     * {@link CategoryDataset}.
+     * 
+     * @param data  the data ({@code null} not permitted) that must be writed
+     * @param writer  object ({@code null} not permitted) where we want to write to
+     * 
+     * @throws IOException if there is an I/O problem.
+     */
+	private static void writingTool(KeyedValues2D data, Writer writer) throws IOException {
+		List<Comparable<?>> columnKeys = data.getColumnKeys();
+		List<Comparable<?>> rowKeys = data.getRowKeys();
+		writer.write("{");
+		if (!columnKeys.isEmpty()) {
+			writer.write("\"columnKeys\": [");
+			boolean first = true;
+			for (Comparable<?> columnKey : columnKeys) {
+				if (!first) {
+					writer.write(", ");
+				} else {
+					first = false;
+				}
+				writer.write(JSONValue.toJSONString(columnKey.toString()));
+			}
+			writer.write("]");
+		}
+		if (!rowKeys.isEmpty()) {
+			writer.write(", \"rows\": [");
+			boolean firstRow = true;
+			for (Comparable<?> rowKey : rowKeys) {
+				if (!firstRow) {
+					writer.write(", [");
+				} else {
+					writer.write("[");
+					firstRow = false;
+				}
+				writer.write(JSONValue.toJSONString(rowKey.toString()));
+				writer.write(", [");
+				boolean first = true;
+				for (Comparable<?> columnKey : columnKeys) {
+					if (!first) {
+						writer.write(", ");
+					} else {
+						first = false;
+					}
+					writer.write(JSONValue.toJSONString(data.getValue(rowKey, columnKey)));
+				}
+				writer.write("]]");
+			}
+			writer.write("]");
+		}
+		writer.write("}");
+	}
     
 }
