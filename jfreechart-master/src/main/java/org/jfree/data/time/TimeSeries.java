@@ -539,38 +539,23 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     public void add(TimeSeriesDataItem item, boolean notify) {
         Args.nullNotPermitted(item, "item");
         item = (TimeSeriesDataItem) item.clone();
-        Class c = item.getPeriod().getClass();
-        if (this.timePeriodClass == null) {
-            this.timePeriodClass = c;
-        } else if (!this.timePeriodClass.equals(c)) {
-            StringBuilder b = new StringBuilder();
-            b.append("You are trying to add data where the time period class ");
-            b.append("is ");
-            b.append(item.getPeriod().getClass().getName());
-            b.append(", but the TimeSeries is expecting an instance of ");
-            b.append(this.timePeriodClass.getName());
-            b.append(".");
-            throw new SeriesException(b.toString());
-        }
-
+        setTimePeriodClass(item);
+        
         // make the change (if it's not a duplicate time period)...
         boolean added = false;
         int count = getItemCount();
         if (count == 0) {
-            this.data.add(item);
-            added = true;
+        	added = addData(item);
         }
         else {
             RegularTimePeriod last = getTimePeriod(getItemCount() - 1);
             if (item.getPeriod().compareTo(last) > 0) {
-                this.data.add(item);
-                added = true;
+            	added = addData(item);
             }
             else {
                 int index = Collections.binarySearch(this.data, item);
                 if (index < 0) {
-                    this.data.add(-index - 1, item);
-                    added = true;
+                	added = addData(-index - 1, item);
                 }
                 else {
                     StringBuilder b = new StringBuilder();
@@ -599,8 +584,29 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
                 fireSeriesChanged();
             }
         }
-
     }
+    
+    /**
+     * Inserts the item at the specified position in data list
+     * @param index the index of the search item
+     * @param item the time series data item
+     * @return item added as {@code boolean}
+     */
+    private boolean addData(int index, TimeSeriesDataItem item) {
+        this.data.add(index, item);
+        return true;
+    }
+    
+    /**
+     * Appends the item to the end of data list
+     * @param item item the time series data item
+     * @return item added as {@code boolean}
+     */
+    private boolean addData(TimeSeriesDataItem item) {
+        this.data.add(item);
+        return true;
+    }
+
 
     /**
      * Adds a new data item to the series and sends a {@link SeriesChangeEvent}
@@ -696,19 +702,14 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
         boolean iterate = false;
         Number oldYN = item.getValue();
         if (oldYN != null) {
-            double oldY = oldYN.doubleValue();
-            if (!Double.isNaN(oldY)) {
-                iterate = oldY <= this.minY || oldY >= this.maxY;
-            }
+            iterate = itemContributesToBounds(oldYN.doubleValue(), this.minY, this.maxY);
         }
         item.setValue(value);
         if (iterate) {
             updateMinMaxYByIteration();
         }
-        else if (value != null) {
-            double yy = value.doubleValue();
-            this.minY = minIgnoreNaN(this.minY, yy);
-            this.maxY = maxIgnoreNaN(this.maxY, yy);
+        else if (value != null) {            
+        	updateMinMaxY(value.doubleValue());
         }
         fireSeriesChanged();
     }
@@ -780,17 +781,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     public TimeSeriesDataItem addOrUpdate(TimeSeriesDataItem item) {
 
         Args.nullNotPermitted(item, "item");
-        Class periodClass = item.getPeriod().getClass();
-        if (this.timePeriodClass == null) {
-            this.timePeriodClass = periodClass;
-        }
-        else if (!this.timePeriodClass.equals(periodClass)) {
-            String msg = "You are trying to add data where the time "
-                    + "period class is " + periodClass.getName()
-                    + ", but the TimeSeries is expecting an instance of "
-                    + this.timePeriodClass.getName() + ".";
-            throw new SeriesException(msg);
-        }
+        setTimePeriodClass(item);
         TimeSeriesDataItem overwritten = null;
         int index = Collections.binarySearch(this.data, item);
         if (index >= 0) {
@@ -798,25 +789,20 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
             overwritten = (TimeSeriesDataItem) existing.clone();
             // figure out if we need to iterate through all the y-values
             // to find the revised minY / maxY
-            boolean iterate = false;
             Number oldYN = existing.getValue();
             double oldY = oldYN != null ? oldYN.doubleValue() : Double.NaN;
-            if (!Double.isNaN(oldY)) {
-                iterate = oldY <= this.minY || oldY >= this.maxY;
-            }
+            boolean iterate = itemContributesToBounds(oldY, this.minY, this.maxY);
             existing.setValue(item.getValue());
             if (iterate) {
                 updateMinMaxYByIteration();
             }
             else if (item.getValue() != null) {
-                double yy = item.getValue().doubleValue();
-                this.minY = minIgnoreNaN(this.minY, yy);
-                this.maxY = maxIgnoreNaN(this.maxY, yy);
+            	updateMinMaxY(item.getValue().doubleValue());
             }
         }
         else {
             item = (TimeSeriesDataItem) item.clone();
-            this.data.add(-index - 1, item);
+            addData(-index - 1, item);
             updateBoundsForAddedItem(item);
 
             // check if this addition will exceed the maximum item count...
@@ -831,6 +817,26 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
         fireSeriesChanged();
         return overwritten;
 
+    }
+    
+    /**
+     * Sets the period type for the data.
+     *
+     * @param item  the time series data item
+     */
+    
+    private void setTimePeriodClass(TimeSeriesDataItem item) {
+        Class periodClass = item.getPeriod().getClass();
+	    if (this.timePeriodClass == null) {
+	        this.timePeriodClass = periodClass;
+	    }
+	    else if (!this.timePeriodClass.equals(periodClass)) {
+	        String msg = "You are trying to add data where the time "
+	                + "period class is " + periodClass.getName()
+	                + ", but the TimeSeries is expecting an instance of "
+	                + this.timePeriodClass.getName() + ".";
+	        throw new SeriesException(msg);
+	    }
     }
 
     /**
@@ -1163,9 +1169,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     private void updateBoundsForAddedItem(TimeSeriesDataItem item) {
         Number yN = item.getValue();
         if (item.getValue() != null) {
-            double y = yN.doubleValue();
-            this.minY = minIgnoreNaN(this.minY, y);
-            this.maxY = maxIgnoreNaN(this.maxY, y);
+        	updateMinMaxY(yN.doubleValue());
         }
     }
     
@@ -1187,6 +1191,16 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
                 }
             }
         }
+    }
+    
+    /**
+     * Updates the minimum and maximum y-values.
+     *
+     * @param yy  the data item value.
+     */
+    public void updateMinMaxY(double yy) {
+	    this.minY = minIgnoreNaN(this.minY, yy);
+	    this.maxY = maxIgnoreNaN(this.maxY, yy);
     }
 
     /**

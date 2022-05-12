@@ -37,6 +37,7 @@
 package org.jfree.data.time;
 
 import org.jfree.chart.internal.Args;
+import org.jfree.data.general.Series;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -120,42 +121,61 @@ public class MovingAverage {
 
                 if (serial >= firstSerial) {
                     // work out the average for the earlier values...
-                    int n = 0;
-                    double sum = 0.0;
-                    long serialLimit = period.getSerialIndex() - periodCount;
-                    int offset = 0;
-                    boolean finished = false;
+                	workOutAverage(result, source, period, i, periodCount);
 
-                    while ((offset < periodCount) && (!finished)) {
-                        if ((i - offset) >= 0) {
-                            TimeSeriesDataItem item = source.getRawDataItem(
-                                    i - offset);
-                            RegularTimePeriod p = item.getPeriod();
-                            Number v = item.getValue();
-                            long currentIndex = p.getSerialIndex();
-                            if (currentIndex > serialLimit) {
-                                if (v != null) {
-                                    sum = sum + v.doubleValue();
-                                    n = n + 1;
-                                }
-                            }
-                            else {
-                                finished = true;
-                            }
-                        }
-                        offset = offset + 1;
-                    }
-                    if (n > 0) {
-                        result.add(period, sum / n);
-                    }
-                    else {
-                        result.add(period, null);
-                    }
                 }
 
             }
         }
         return result;
+    }
+    
+    /**
+     * Calculates average values ​​for the given series.
+     *
+     * @param result the moving average series.
+     * @param source  the source series.
+     * @param period  the time period.
+     * @param itemCount the item count.
+     * @param periodCount  the number of periods used in the average
+     *                     calculation.
+     * @param <S>  the type for the series keys.
+     */
+
+	private static <S extends Comparable<S>> void workOutAverage(TimeSeries<S> result, TimeSeries<S> source, 
+			RegularTimePeriod period, int itemCount, int periodCount) {
+    
+	    int n = 0;
+	    double sum = 0.0;
+	    long serialLimit = period.getSerialIndex() - periodCount;
+	    int offset = 0;
+	    boolean finished = false;
+	
+	    while ((offset < periodCount) && (!finished)) {
+	        if ((itemCount - offset) >= 0) {
+	            TimeSeriesDataItem item = source.getRawDataItem(
+	            		itemCount - offset);
+	            RegularTimePeriod p = item.getPeriod();
+	            Number v = item.getValue();
+	            long currentIndex = p.getSerialIndex();
+	            if (currentIndex > serialLimit) {
+	                if (v != null) {
+	                    sum = sum + v.doubleValue();
+	                    n = n + 1;
+	                }
+	            }
+	            else {
+	                finished = true;
+	            }
+	        }
+	        offset = offset + 1;
+	    }
+	    if (n > 0) {
+	        result.add(period, sum / n);
+	    }
+	    else {
+	        result.add(period, null);
+	    }
     }
 
     /**
@@ -292,44 +312,58 @@ public class MovingAverage {
 
                 if (x >= first) {
                     // work out the average for the earlier values...
-                    int n = 0;
-                    double sum = 0.0;
-                    double limit = x - period;
-                    int offset = 0;
-                    boolean finished = false;
-
-                    while (!finished) {
-                        if ((i - offset) >= 0) {
-                            double xx = source.getXValue(series, i - offset);
-                            Number yy = source.getY(series, i - offset);
-                            if (xx > limit) {
-                                if (yy != null) {
-                                    sum = sum + yy.doubleValue();
-                                    n = n + 1;
-                                }
-                            }
-                            else {
-                                finished = true;
-                            }
-                        }
-                        else {
-                            finished = true;
-                        }
-                        offset = offset + 1;
-                    }
-                    if (n > 0) {
-                        result.add(x, sum / n);
-                    }
-                    else {
-                        result.add(x, null);
-                    }
+                	workOutAverage(result, source, series, period, i, x);
                 }
 
             }
         }
 
         return result;
-
     }
 
+    /**
+     * Calculates average values ​​of one series
+     *
+     * @param result the dataset.
+     * @param source  the source dataset.
+     * @param series  the series index (zero based).
+     * @param period  the averaging period.
+     * @param itemCount the item count
+     * @param dataItem  the current data item. 
+     * @param <S>  the type for the series keys.
+     */
+	private static void workOutAverage(XYSeries result, XYDataset source, 
+			int series, double period, int itemCount, double dataItem) {
+		int n = 0;
+		double sum = 0.0;
+		double limit = dataItem - period;
+		int offset = 0;
+		boolean finished = false;
+
+		while (!finished) {
+			if ((itemCount - offset) >= 0) {
+				double xx = source.getXValue(series, itemCount - offset);
+				Number yy = source.getY(series, itemCount - offset);
+				if (xx > limit) {
+					if (yy != null) {
+						sum = sum + yy.doubleValue();
+						n = n + 1;
+					}
+				}
+				else {
+					finished = true;
+				}
+			}
+			else {
+				finished = true;
+			}
+			offset = offset + 1;
+		}
+		if (n > 0) {
+			result.add(dataItem, sum / n);
+		}
+		else {
+			result.add(dataItem, null);
+		}
+	}
 }

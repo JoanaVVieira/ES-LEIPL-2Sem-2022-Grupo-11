@@ -127,6 +127,27 @@ public abstract class Series<K extends Comparable<K>>
     }
 
     /**
+     * Checks the bounds of the x or y values ​​for the series, 
+     * iterating through all the data items.
+     * If true, the bounds of the x or y values ​​are out of date.
+     * 
+     * @param itemValue the series value
+     * @param minValue the minimum value in the series.
+     * @param maxValue the maximum value in the series.
+     * 
+     * @return A boolean.
+     */
+	public boolean itemContributesToBounds(double itemValue, double minValue, double maxValue) {
+		boolean iterate = false;
+		if (!Double.isNaN(itemValue)) {
+			if (itemValue <= minValue || itemValue >= maxValue) {
+				iterate = true;
+			}
+		}
+		return iterate;
+	}
+
+    /**
      * Returns the number of data items in the series.
      *
      * @return The number of data items in the series.
