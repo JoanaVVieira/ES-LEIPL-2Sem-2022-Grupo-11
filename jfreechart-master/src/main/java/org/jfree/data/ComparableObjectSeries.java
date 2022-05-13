@@ -255,14 +255,14 @@ public class ComparableObjectSeries<K extends Comparable<K>> extends Series<K>
      *
      * @return the index needed to iterate in item
      */
-	private int indexReference(ComparableObjectItem item, int index) throws SeriesException {
+	private int indexReference(ComparableObjectItem item, int index) {
 		if (this.allowDuplicateXValues) {
 			int size = this.data.size();
 			while (index < size && item.compareTo(this.data.get(index)) == 0) {
 				index++;
 			}
 		} else {
-			throw new SeriesException("X-value already exists.");
+			throw new RuntimeException("X-value already exists.");
 		}
 		return index;
 	}
