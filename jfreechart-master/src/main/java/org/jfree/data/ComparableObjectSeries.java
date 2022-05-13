@@ -214,13 +214,8 @@ public class ComparableObjectSeries<K extends Comparable<K>> extends Series<K>
                 this.data.add(-index - 1, item);
             }
             else {
-                if (this.allowDuplicateXValues) {
-                    // need to make sure we are adding *after* any duplicates
-                    int size = this.data.size();
-                    while (index < size
-                           && item.compareTo(this.data.get(index)) == 0) {
-                        index++;
-                    }
+                index = indexReference(item, index);
+				if (this.allowDuplicateXValues) {
                     if (index < this.data.size()) {
                         this.data.add(index, item);
                     }
@@ -251,6 +246,26 @@ public class ComparableObjectSeries<K extends Comparable<K>> extends Series<K>
             fireSeriesChanged();
         }
     }
+
+    /**
+     * Return the index needed to iterate in a given item
+     *
+     * @param item reference to the object that we want to calculate the index needed
+     * @param index parameter initialized so we can add the right properties to it given an item
+     *
+     * @return the index needed to iterate in item
+     */
+	private int indexReference(ComparableObjectItem item, int index) throws SeriesException {
+		if (this.allowDuplicateXValues) {
+			int size = this.data.size();
+			while (index < size && item.compareTo(this.data.get(index)) == 0) {
+				index++;
+			}
+		} else {
+			throw new SeriesException("X-value already exists.");
+		}
+		return index;
+	}
 
     /**
      * Returns the index of the item with the specified x-value, or a negative
@@ -368,7 +383,6 @@ public class ComparableObjectSeries<K extends Comparable<K>> extends Series<K>
      * {@link SeriesChangeEvent} to all registered listeners.
      *
      * @param x  the x-value.
-
      * @return The item removed.
      */
     public ComparableObjectItem remove(Comparable<?> x) {

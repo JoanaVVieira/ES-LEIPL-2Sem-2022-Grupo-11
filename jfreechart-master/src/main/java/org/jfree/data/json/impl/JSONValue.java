@@ -288,55 +288,73 @@ public class JSONValue {
         return sb.toString();
     }
 
-    /**
-     * @param s - Must not be null.
-     * @param sb
+    /**Goes through a string and write it on a buffer as HexString
+     * 
+     * 
+     * @param s string to be iterated
+     * @param sb buffer that gets the procedure result, Hexstring text
      */
     static void escape(String s, StringBuffer sb) {
         for(int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-            switch(ch){
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            default:
-                //Reference: http://www.unicode.org/versions/Unicode5.1.0/
-                if ((ch >= '\u0000' && ch <= '\u001F') 
-                        || (ch >= '\u007F' && ch <= '\u009F') 
-                        || (ch >= '\u2000' && ch <= '\u20FF')) {
-                    String ss = Integer.toHexString(ch);
-                    sb.append("\\u");
-                    for (int k = 0; k < 4 - ss.length(); k++) {
-                        sb.append('0');
-                    }
-                    sb.append(ss.toUpperCase());
-                }
-                else {
-                    sb.append(ch);
-                }
-            }
-        }//for
+            sb(s, sb, i);
+        }
     }
 
+    /**Iterates each character from a given String
+     * 
+     * @param s String to iterate
+     * @param sb data model to write the result in
+     */
+	private static void sb(String s, StringBuffer sb, int i) {
+		char ch = s.charAt(i);
+		switch (ch) {
+		case '"':
+			sb.append("\\\"");
+			break;
+		case '\\':
+			sb.append("\\\\");
+			break;
+		case '\b':
+			sb.append("\\b");
+			break;
+		case '\f':
+			sb.append("\\f");
+			break;
+		case '\n':
+			sb.append("\\n");
+			break;
+		case '\r':
+			sb.append("\\r");
+			break;
+		case '\t':
+			sb.append("\\t");
+			break;
+		case '/':
+			sb.append("\\/");
+			break;
+		default:
+			appendHexStringToStringBuffer(ch, sb);
+		}
+	}
+    
+    //Reference: http://www.unicode.org/versions/Unicode5.1.0/
+    /**Appends the Hexstring conversation into a Buffer
+     * 
+     * @param s char to convert to HexString
+     * @param sb Buffer to append the result of the char convert
+     */
+    private static void appendHexStringToStringBuffer(char ch, StringBuffer sb) {
+        if (   (ch >= 	'\u0000' && ch <= '\u001F') 
+           	|| (ch >= '\u007F' && ch <= '\u009F') 
+        	|| (ch >= '\u2000' && ch <= '\u20FF')){
+            String ss = Integer.toHexString(ch);
+            sb.append("\\u");
+            for (int k = 0; k < 4 - ss.length(); k++) {
+                sb.append('0');
+            }
+            sb.append(ss.toUpperCase());
+        } else {
+            sb.append(ch);
+        }
+    }
 }

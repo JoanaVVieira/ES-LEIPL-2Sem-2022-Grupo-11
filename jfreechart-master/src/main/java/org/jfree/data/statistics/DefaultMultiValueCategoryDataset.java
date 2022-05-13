@@ -112,16 +112,9 @@ public class DefaultMultiValueCategoryDataset<R extends Comparable<R>, C extends
         this.data.addObject(vlist, rowKey, columnKey);
 
         if (vlist.size() > 0) {
-            double maxval = Double.NEGATIVE_INFINITY;
-            double minval = Double.POSITIVE_INFINITY;
-            for (int i = 0; i < vlist.size(); i++) {
-                Number n = (Number) vlist.get(i);
-                double v = n.doubleValue();
-                minval = Math.min(minval, v);
-                maxval = Math.max(maxval, v);
-            }
-
-            // update the cached range values...
+            double maxval = maxval(vlist);
+			double minval = minval(vlist);
+			// update the cached range values...
             if (this.maximumRangeValue == null) {
                 this.maximumRangeValue = maxval;
             }
@@ -141,6 +134,38 @@ public class DefaultMultiValueCategoryDataset<R extends Comparable<R>, C extends
 
         fireDatasetChanged();
     }
+    /**
+     * Returns the minimum value of a Number and NaN List.
+     *
+     * @param vlist the list to iterate through
+     *
+     * @return the minimum value from the list.
+     */
+	private double minval(List<Double> vlist) {
+		double minval = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < vlist.size(); i++) {
+			Number n = (Number) vlist.get(i);
+			double v = n.doubleValue();
+			minval = Math.min(minval, v);
+		}
+		return minval;
+	}
+    /**
+     * Returns the maximum value of a Number and NaN List.
+     *
+     * @param vlist the list to iterate through
+     *
+     * @return the maximum value from the list.
+     */
+	private double maxval(List<Double> vlist) {
+		double maxval = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < vlist.size(); i++) {
+			Number n = (Number) vlist.get(i);
+			double v = n.doubleValue();
+			maxval = Math.max(maxval, v);
+		}
+		return maxval;
+	}
 
     /**
      * Returns a list (possibly empty) of the values for the specified item.
@@ -187,14 +212,13 @@ public class DefaultMultiValueCategoryDataset<R extends Comparable<R>, C extends
      */
     @Override
     public Number getValue(Comparable row, Comparable column) {
-        List l = (List) this.data.getObject(row, column);
+        int count = count(row, column);
+		List l = (List) this.data.getObject(row, column);
         double average = 0.0d;
-        int count = 0;
         if (l != null && l.size() > 0) {
             for (int i = 0; i < l.size(); i++) {
                 Number n = (Number) l.get(i);
                 average += n.doubleValue();
-                count += 1;
             }
             if (count > 0) {
                 average = average / count;
@@ -207,6 +231,25 @@ public class DefaultMultiValueCategoryDataset<R extends Comparable<R>, C extends
     }
 
     /**
+     * Counts the number of valid variables in a dataset formed by rows and columns
+     *
+     * @param row the row to iterate in a data set
+     * @param column the column to iterate in a data set
+     *
+     * @return the mnumber of valid comparable variables in a data set
+     */
+	private int count(Comparable row, Comparable column) {
+		List l = (List) this.data.getObject(row, column);
+		int count = 0;
+		if (l != null && l.size() > 0) {
+			for (int i = 0; i < l.size(); i++) {
+				count += 1;
+			}
+		}
+		return count;
+	}
+
+    /**
      * Returns the average value for the specified item.
      *
      * @param row  the row index.
@@ -216,14 +259,13 @@ public class DefaultMultiValueCategoryDataset<R extends Comparable<R>, C extends
      */
     @Override
     public Number getValue(int row, int column) {
-        List l = (List) this.data.getObject(row, column);
+        int count = countDataObjectSize(row, column);
+		List l = (List) this.data.getObject(row, column);
         double average = 0.0d;
-        int count = 0;
         if (l != null && l.size() > 0) {
             for (int i = 0; i < l.size(); i++) {
                 Number n = (Number) l.get(i);
                 average += n.doubleValue();
-                count += 1;
             }
             if (count > 0) {
                 average = average / count;
@@ -234,6 +276,25 @@ public class DefaultMultiValueCategoryDataset<R extends Comparable<R>, C extends
         }
         return average;
     }
+    
+    /**
+     * Returns the object dataset size
+     *
+     * @param row  the row index.
+     * @param column  the column index.
+     *
+     * @return the size of the dataset
+     */
+	private int countDataObjectSize(int row, int column) {
+		List l = (List) this.data.getObject(row, column);
+		int count = 0;
+		if (l != null && l.size() > 0) {
+			for (int i = 0; i < l.size(); i++) {
+				count += 1;
+			}
+		}
+		return count;
+	}
 
     /**
      * Returns the column index for a given key.
