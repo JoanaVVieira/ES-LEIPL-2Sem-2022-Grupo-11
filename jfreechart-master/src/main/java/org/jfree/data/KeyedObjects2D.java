@@ -205,7 +205,7 @@ public class KeyedObjects2D<R extends Comparable<R>, C extends Comparable<C>>
      *
      * @throws IllegalArgumentException if {@code rowKey} or
      *         {@code columnKey} is {@code null}.
-     * @throws UnknownKeyException if {@code rowKey} or
+     * @throws IllegalArgumentException if {@code rowKey} or
      *         {@code columnKey} is not recognised.
      */
     public Object getObject(R rowKey, C columnKey) {
@@ -213,12 +213,12 @@ public class KeyedObjects2D<R extends Comparable<R>, C extends Comparable<C>>
         Args.nullNotPermitted(columnKey, "columnKey");
         int row = this.rowKeys.indexOf(rowKey);
         if (row < 0) {
-            throw new UnknownKeyException("Row key (" + rowKey
+            throw new IllegalArgumentException("Row key (" + rowKey
                     + ") not recognised.");
         }
         int column = this.columnKeys.indexOf(columnKey);
         if (column < 0) {
-            throw new UnknownKeyException("Column key (" + columnKey
+            throw new IllegalArgumentException("Column key (" + columnKey
                     + ") not recognised.");
         }
         KeyedObjects rowData = (KeyedObjects) this.rows.get(row);
@@ -282,12 +282,12 @@ public class KeyedObjects2D<R extends Comparable<R>, C extends Comparable<C>>
     public void removeObject(R rowKey, C columnKey) {
         int rowIndex = getRowIndex(rowKey);
         if (rowIndex < 0) {
-            throw new UnknownKeyException("Row key (" + rowKey
+            throw new IllegalArgumentException("Row key (" + rowKey
                     + ") not recognised.");
         }
         int columnIndex = getColumnIndex(columnKey);
         if (columnIndex < 0) {
-            throw new UnknownKeyException("Column key (" + columnKey
+            throw new IllegalArgumentException("Column key (" + columnKey
                     + ") not recognised.");
         }
         setObject(null, rowKey, columnKey);
@@ -352,14 +352,14 @@ public class KeyedObjects2D<R extends Comparable<R>, C extends Comparable<C>>
      *
      * @param rowKey  the row key ({@code null} not permitted).
      *
-     * @throws UnknownKeyException if {@code rowKey} is not recognised.
+     * @throws IllegalArgumentException if {@code rowKey} is not recognised.
      *
      * @see #removeColumn(Comparable)
      */
     public void removeRow(R rowKey) {
         int index = getRowIndex(rowKey);
         if (index < 0) {
-            throw new UnknownKeyException("Row key (" + rowKey
+            throw new IllegalArgumentException("Row key (" + rowKey
                     + ") not recognised.");
         }
         removeRow(index);
@@ -382,14 +382,14 @@ public class KeyedObjects2D<R extends Comparable<R>, C extends Comparable<C>>
      *
      * @param columnKey  the column key ({@code null} not permitted).
      *
-     * @throws UnknownKeyException if {@code rowKey} is not recognised.
+     * @throws IllegalArgumentException if {@code rowKey} is not recognised.
      *
      * @see #removeRow(Comparable)
      */
     public void removeColumn(C columnKey) {
         int index = getColumnIndex(columnKey);
         if (index < 0) {
-            throw new UnknownKeyException("Column key (" + columnKey
+            throw new IllegalArgumentException("Column key (" + columnKey
                     + ") not recognised.");
         }
         for (KeyedObjects rowData : this.rows) {

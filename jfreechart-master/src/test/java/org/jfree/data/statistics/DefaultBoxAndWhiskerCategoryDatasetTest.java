@@ -42,7 +42,6 @@ import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 
 import org.jfree.data.Range;
-import org.jfree.data.UnknownKeyException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -248,7 +247,7 @@ public class DefaultBoxAndWhiskerCategoryDatasetTest {
         try {
             data.remove("R1", "R2");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

@@ -38,7 +38,6 @@ package org.jfree.data.xy;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-import org.jfree.data.general.SeriesException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -283,7 +282,7 @@ public class XYSeriesTest {
             series.update(2, 99);
             fail();
         }
-        catch (SeriesException e) {
+        catch (RuntimeException e) {
             // got the required exception
         }
     }

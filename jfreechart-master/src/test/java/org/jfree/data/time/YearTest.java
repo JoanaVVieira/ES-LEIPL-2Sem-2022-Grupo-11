@@ -252,7 +252,7 @@ public class YearTest {
         try {
             year = Year.parseYear("2000");
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             year = new Year(1900);
         }
         assertEquals(2000, year.getYear());
@@ -261,7 +261,7 @@ public class YearTest {
         try {
             year = Year.parseYear(" 2001 ");
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             year = new Year(1900);
         }
         assertEquals(2001, year.getYear());
@@ -270,7 +270,7 @@ public class YearTest {
         try {
             year = Year.parseYear("99");
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             year = new Year(1900);
         }
         assertEquals(99, year.getYear());

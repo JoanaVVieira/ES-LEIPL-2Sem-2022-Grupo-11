@@ -51,7 +51,6 @@ import org.jfree.chart.internal.CloneUtils;
 
 import org.jfree.data.general.Series;
 import org.jfree.data.general.SeriesChangeEvent;
-import org.jfree.data.general.SeriesException;
 
 /**
  * Represents a sequence of zero or more data items in the form (x, y).  By
@@ -427,7 +426,7 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
      * @param x  the x-value ({@code null} not permitted).
      * @param y  the y-value ({@code null} permitted).
      *
-     * @throws SeriesException if the x-value is a duplicate and the
+     * @throws RuntimeException if the x-value is a duplicate and the
      *     {@code allowDuplicateXValues} flag is not set for this series.
      */
     public void add(Number x, Number y) {
@@ -483,7 +482,7 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
                     }
                 }
                 else {
-                    throw new SeriesException("X-value already exists.");
+                    throw new RuntimeException("X-value already exists.");
                 }
             }
         }
@@ -493,7 +492,7 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
                 // there is an item with the given x-value already
                 int index = indexOf(item.getX());
                 if (index >= 0) {
-                    throw new SeriesException("X-value already exists.");
+                    throw new RuntimeException("X-value already exists.");
                 }
             }
             this.data.add(item);
@@ -699,13 +698,13 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
      * @param x  the x-value ({@code null} not permitted).
      * @param y  the y-value ({@code null} permitted).
      *
-     * @throws SeriesException if there is no existing item with the specified
+     * @throws RuntimeException if there is no existing item with the specified
      *         x-value.
      */
     public void update(Number x, Number y) {
         int index = indexOf(x);
         if (index < 0) {
-            throw new SeriesException("No observation for x = " + x);
+            throw new RuntimeException("No observation for x = " + x);
         }
         updateByIndex(index, y);
     }
@@ -884,7 +883,7 @@ public class XYSeries<K extends Comparable<K>> extends Series<K>
                 try {
                     copy.add(clone);
                 }
-                catch (SeriesException e) {
+                catch (RuntimeException e) {
                     throw new RuntimeException(
                             "Unable to add cloned data item.", e);
                 }

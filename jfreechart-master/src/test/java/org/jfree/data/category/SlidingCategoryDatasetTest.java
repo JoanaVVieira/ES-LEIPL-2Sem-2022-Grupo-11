@@ -41,7 +41,6 @@ import java.util.List;
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 
-import org.jfree.data.UnknownKeyException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -222,7 +221,7 @@ public class SlidingCategoryDatasetTest {
         try {
             dataset.getValue("R1", "C1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -231,7 +230,7 @@ public class SlidingCategoryDatasetTest {
         try {
             dataset.getValue("R1", "C4");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

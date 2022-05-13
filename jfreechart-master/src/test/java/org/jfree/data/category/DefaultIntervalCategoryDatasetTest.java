@@ -41,7 +41,7 @@ import java.util.List;
 import org.jfree.chart.TestUtils;
 
 import org.jfree.data.DataUtils;
-import org.jfree.data.UnknownKeyException;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -85,7 +85,7 @@ public class DefaultIntervalCategoryDatasetTest {
         try {
             d.getValue("XX", "Category 1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -94,7 +94,7 @@ public class DefaultIntervalCategoryDatasetTest {
         try {
             d.getValue("Series 1", "XX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

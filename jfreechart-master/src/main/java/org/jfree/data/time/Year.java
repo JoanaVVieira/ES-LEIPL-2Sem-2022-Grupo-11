@@ -390,7 +390,7 @@ public class Year extends RegularTimePeriod implements Serializable {
             y = Integer.parseInt(s.trim());
         }
         catch (NumberFormatException e) {
-            throw new TimePeriodFormatException("Cannot parse string.");
+            throw new IllegalArgumentException("Cannot parse string.");
         }
 
         // create the year...
@@ -398,7 +398,7 @@ public class Year extends RegularTimePeriod implements Serializable {
             return new Year(y);
         }
         catch (IllegalArgumentException e) {
-            throw new TimePeriodFormatException("Year outside valid range.");
+            throw new IllegalArgumentException("Year outside valid range.");
         }
     }
 

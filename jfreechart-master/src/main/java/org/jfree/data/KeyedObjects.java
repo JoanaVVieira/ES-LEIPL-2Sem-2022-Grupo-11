@@ -154,7 +154,7 @@ public class KeyedObjects<K extends Comparable<K>> implements Cloneable, PublicC
     public Object getObject(K key) {
         int index = getIndex(key);
         if (index < 0) {
-            throw new UnknownKeyException("The key (" + key
+            throw new IllegalArgumentException("The key (" + key
                     + ") is not recognised.");
         }
         return getObject(index);
@@ -242,13 +242,13 @@ public class KeyedObjects<K extends Comparable<K>> implements Cloneable, PublicC
      *
      * @see #removeValue(int)
      *
-     * @throws UnknownKeyException if the key is not recognised.
+     * @throws IllegalArgumentException if the key is not recognised.
      */
     public void removeValue(K key) {
         // defer argument checking
         int index = getIndex(key);
         if (index < 0) {
-            throw new UnknownKeyException("The key (" + key.toString()
+            throw new IllegalArgumentException("The key (" + key.toString()
                     + ") is not recognised.");
         }
         removeValue(index);

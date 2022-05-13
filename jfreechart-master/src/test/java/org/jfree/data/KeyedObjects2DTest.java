@@ -167,7 +167,7 @@ public class KeyedObjects2DTest {
         try {
             data.getObject("XX", "C1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -176,7 +176,7 @@ public class KeyedObjects2DTest {
         try {
             data.getObject("R1", "XX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -185,7 +185,7 @@ public class KeyedObjects2DTest {
         try {
             data.getObject("XX", "C1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -194,7 +194,7 @@ public class KeyedObjects2DTest {
         try {
             data.getObject("R1", "XX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -320,7 +320,7 @@ public class KeyedObjects2DTest {
         try {
             data.removeRow("XXX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -353,7 +353,7 @@ public class KeyedObjects2DTest {
         try {
             data.removeColumn("XXX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

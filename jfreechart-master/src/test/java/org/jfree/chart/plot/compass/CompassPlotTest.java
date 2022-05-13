@@ -42,7 +42,7 @@ import java.awt.GradientPaint;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-import org.jfree.data.general.DefaultValueDataset;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,7 +126,7 @@ public class CompassPlotTest {
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        CompassPlot p1 = new CompassPlot(new DefaultValueDataset(15.0));
+        CompassPlot p1 = new CompassPlot();
         CompassPlot p2 = CloneUtils.clone(p1);
         assertNotSame(p1, p2);
         assertSame(p1.getClass(), p2.getClass());

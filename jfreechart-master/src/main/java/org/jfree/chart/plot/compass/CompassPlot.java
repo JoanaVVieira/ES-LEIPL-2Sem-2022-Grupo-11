@@ -68,7 +68,6 @@ import org.jfree.chart.internal.SerialUtils;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.PlotState;
-import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.general.ValueDataset;
 
 /**
@@ -146,7 +145,6 @@ public class CompassPlot extends Plot implements Cloneable, Serializable {
      * Default constructor.
      */
     public CompassPlot() {
-        this(new DefaultValueDataset());
     }
 
     /**

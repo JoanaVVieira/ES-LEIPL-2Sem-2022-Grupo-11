@@ -39,7 +39,6 @@ package org.jfree.data.time;
 import org.jfree.chart.internal.Args;
 import org.jfree.data.general.Series;
 import org.jfree.data.general.SeriesChangeEvent;
-import org.jfree.data.general.SeriesException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -403,7 +402,7 @@ public class TimePeriodValues<S extends Comparable<S>> extends Series<S>
                 try {
                     copy.add(clone);
                 }
-                catch (SeriesException e) {
+                catch (RuntimeException e) {
                     System.err.println("Failed to add cloned item.");
                 }
             }

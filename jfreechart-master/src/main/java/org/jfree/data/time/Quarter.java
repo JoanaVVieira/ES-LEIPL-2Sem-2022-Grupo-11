@@ -463,11 +463,11 @@ public class Quarter extends RegularTimePeriod implements Serializable {
         // string)...
         int i = s.indexOf("Q");
         if (i == -1) {
-            throw new TimePeriodFormatException("Missing Q.");
+            throw new IllegalArgumentException("Missing Q.");
         }
 
         if (i == s.length() - 1) {
-            throw new TimePeriodFormatException("Q found at end of string.");
+            throw new IllegalArgumentException("Q found at end of string.");
         }
 
         String qstr = s.substring(i + 1, i + 2);

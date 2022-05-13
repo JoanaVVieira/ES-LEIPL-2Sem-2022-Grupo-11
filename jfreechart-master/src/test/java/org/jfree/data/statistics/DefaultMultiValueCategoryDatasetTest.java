@@ -42,7 +42,6 @@ import java.util.List;
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 
-import org.jfree.data.UnknownKeyException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,7 +67,7 @@ public class DefaultMultiValueCategoryDatasetTest {
         try {
             d.getValue("XX", "C1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -77,7 +76,7 @@ public class DefaultMultiValueCategoryDatasetTest {
         try {
             d.getValue("R1", "XX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

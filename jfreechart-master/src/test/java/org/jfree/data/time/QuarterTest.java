@@ -309,7 +309,7 @@ public class QuarterTest {
         try {
             quarter = Quarter.parseQuarter("Q1-2000");
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             quarter = new Quarter(1, 1900);
         }
         assertEquals(1, quarter.getQuarter());
@@ -319,7 +319,7 @@ public class QuarterTest {
         try {
             quarter = Quarter.parseQuarter("2001-Q2");
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             quarter = new Quarter(1, 1900);
         }
         assertEquals(2, quarter.getQuarter());
@@ -329,7 +329,7 @@ public class QuarterTest {
         try {
             quarter = Quarter.parseQuarter("Q3, 2002");
         }
-        catch (TimePeriodFormatException e) {
+        catch (IllegalArgumentException e) {
             quarter = new Quarter(1, 1900);
         }
         assertEquals(3, quarter.getQuarter());

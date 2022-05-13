@@ -39,7 +39,7 @@ package org.jfree.data.category;
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
-import org.jfree.data.UnknownKeyException;
+
 
 import org.junit.jupiter.api.Test;
 
@@ -62,7 +62,7 @@ public class DefaultCategoryDatasetTest {
         try {
             d.getValue("XX", "C1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -71,7 +71,7 @@ public class DefaultCategoryDatasetTest {
         try {
             d.getValue("R1", "XX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -113,7 +113,7 @@ public class DefaultCategoryDatasetTest {
         try {
             d.incrementValue(1.0, "XX", "C1");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -123,7 +123,7 @@ public class DefaultCategoryDatasetTest {
         try {
             d.incrementValue(1.0, "R1", "XX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -333,7 +333,7 @@ public class DefaultCategoryDatasetTest {
         try {
             d.removeColumn("XXX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
@@ -364,7 +364,7 @@ public class DefaultCategoryDatasetTest {
         try {
             d.removeRow("XXX");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);

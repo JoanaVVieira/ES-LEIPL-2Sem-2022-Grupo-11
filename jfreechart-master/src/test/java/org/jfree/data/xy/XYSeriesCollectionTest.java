@@ -41,7 +41,7 @@ import org.jfree.chart.api.PublicCloneable;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.data.DatasetChangeConfirmation;
 import org.jfree.data.Range;
-import org.jfree.data.UnknownKeyException;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -217,7 +217,7 @@ public class XYSeriesCollectionTest {
             c.getSeries("s2");
             fail("Should have thrown UnknownKeyException on unknown key");
         }
-        catch (UnknownKeyException e) {
+        catch (IllegalArgumentException e) {
             assertEquals("Key not found: s2", e.getMessage());
         }
 

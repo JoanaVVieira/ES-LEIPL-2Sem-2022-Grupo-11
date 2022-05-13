@@ -45,7 +45,7 @@ import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -244,7 +244,7 @@ public class MeterPlotTest {
      */
     @Test
     public void testSerialization2() {
-        MeterPlot p1 = new MeterPlot(new DefaultValueDataset(1.23));
+        MeterPlot p1 = new MeterPlot();
         MeterPlot p2 = TestUtils.serialised(p1);
         assertEquals(p1, p2);
 

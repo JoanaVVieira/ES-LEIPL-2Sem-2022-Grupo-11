@@ -44,7 +44,6 @@ import java.util.Collections;
 import java.util.List;
 import org.jfree.chart.api.PublicCloneable;
 
-import org.jfree.data.UnknownKeyException;
 import org.jfree.data.general.AbstractDataset;
 import org.jfree.data.general.DatasetChangeEvent;
 
@@ -252,17 +251,17 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
      *
      * @return The value (possibly {@code null}).
      *
-     * @throws UnknownKeyException if either key is not defined in the dataset.
+     * @throws IllegalArgumentException if either key is not defined in the dataset.
      */
     @Override
     public Number getValue(Comparable rowKey, Comparable columnKey) {
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         }
         else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getValue(r, c + this.firstCategoryIndex);
@@ -321,10 +320,10 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         }
         else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getPercentComplete(r,
@@ -349,10 +348,10 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         }
         else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getPercentComplete(r,
@@ -377,10 +376,10 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         }
         else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getEndValue(r,
@@ -453,10 +452,10 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         }
         else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getStartValue(r,
@@ -496,9 +495,9 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         } else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getSubIntervalCount(r,
@@ -537,9 +536,9 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         } else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getStartValue(r,
@@ -578,9 +577,9 @@ public class SlidingGanttCategoryDataset extends AbstractDataset
         int r = getRowIndex(rowKey);
         int c = getColumnIndex(columnKey);
         if (c == -1) {
-            throw new UnknownKeyException("Unknown columnKey: " + columnKey);
+            throw new IllegalArgumentException("Unknown columnKey: " + columnKey);
         } else if (r == -1) {
-            throw new UnknownKeyException("Unknown rowKey: " + rowKey);
+            throw new IllegalArgumentException("Unknown rowKey: " + rowKey);
         }
         else {
             return this.underlying.getEndValue(r, c + this.firstCategoryIndex);

@@ -90,7 +90,7 @@ public interface KeyedValues<K extends Comparable<K>> extends Values {
      *
      * @return The value (possibly {@code null}).
      *
-     * @throws UnknownKeyException if the key is not recognised.
+     * @throws IllegalArgumentException if the key is not recognised.
      */
     Number getValue(K key);
 

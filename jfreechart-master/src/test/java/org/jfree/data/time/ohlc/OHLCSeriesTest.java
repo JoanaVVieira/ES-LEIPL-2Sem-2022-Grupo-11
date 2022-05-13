@@ -41,7 +41,6 @@ import org.jfree.chart.internal.CloneUtils;
 
 import org.jfree.data.general.SeriesChangeEvent;
 import org.jfree.data.general.SeriesChangeListener;
-import org.jfree.data.general.SeriesException;
 import org.jfree.data.time.Year;
 import org.junit.jupiter.api.Test;
 
@@ -196,7 +195,7 @@ public class OHLCSeriesTest implements SeriesChangeListener {
         try {
             s1.add(new Year(2006), 1.0, 1.0, 1.0, 1.0);
         }
-        catch (SeriesException e) {
+        catch (RuntimeException e) {
             pass = true;
         }
         assertTrue(pass);

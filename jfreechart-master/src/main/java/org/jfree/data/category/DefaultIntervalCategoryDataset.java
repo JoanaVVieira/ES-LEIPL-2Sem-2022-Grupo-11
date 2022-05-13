@@ -44,7 +44,6 @@ import java.util.ResourceBundle;
 import org.jfree.chart.internal.Args;
 
 import org.jfree.data.DataUtils;
-import org.jfree.data.UnknownKeyException;
 import org.jfree.data.general.AbstractSeriesDataset;
 
 /**
@@ -350,11 +349,11 @@ public class DefaultIntervalCategoryDataset extends AbstractSeriesDataset
     public Number getValue(Comparable series, Comparable category) {
         int seriesIndex = getSeriesIndex(series);
         if (seriesIndex < 0) {
-            throw new UnknownKeyException("Unknown 'series' key.");
+            throw new IllegalArgumentException("Unknown 'series' key.");
         }
         int itemIndex = getColumnIndex(category);
         if (itemIndex < 0) {
-            throw new UnknownKeyException("Unknown 'category' key.");
+            throw new IllegalArgumentException("Unknown 'category' key.");
         }
         return getValue(seriesIndex, itemIndex);
     }
@@ -392,11 +391,11 @@ public class DefaultIntervalCategoryDataset extends AbstractSeriesDataset
     public Number getStartValue(Comparable series, Comparable category) {
         int seriesIndex = getSeriesIndex(series);
         if (seriesIndex < 0) {
-            throw new UnknownKeyException("Unknown 'series' key.");
+            throw new IllegalArgumentException("Unknown 'series' key.");
         }
         int itemIndex = getColumnIndex(category);
         if (itemIndex < 0) {
-            throw new UnknownKeyException("Unknown 'category' key.");
+            throw new IllegalArgumentException("Unknown 'category' key.");
         }
         return getStartValue(seriesIndex, itemIndex);
     }
@@ -447,11 +446,11 @@ public class DefaultIntervalCategoryDataset extends AbstractSeriesDataset
     public Number getEndValue(Comparable series, Comparable category) {
         int seriesIndex = getSeriesIndex(series);
         if (seriesIndex < 0) {
-            throw new UnknownKeyException("Unknown 'series' key.");
+            throw new IllegalArgumentException("Unknown 'series' key.");
         }
         int itemIndex = getColumnIndex(category);
         if (itemIndex < 0) {
-            throw new UnknownKeyException("Unknown 'category' key.");
+            throw new IllegalArgumentException("Unknown 'category' key.");
         }
         return getEndValue(seriesIndex, itemIndex);
     }
