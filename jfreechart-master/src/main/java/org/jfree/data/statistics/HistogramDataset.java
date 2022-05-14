@@ -62,7 +62,7 @@ public class HistogramDataset extends AbstractIntervalXYDataset
         implements IntervalXYDataset, Cloneable, PublicCloneable,
                    Serializable {
 
-    private transient HistogramDatasetProduct histogramDatasetProduct = new HistogramDatasetProduct();
+    private HistogramDatasetProduct histogramDatasetProduct = new HistogramDatasetProduct();
 
 	/** For serialization. */
     private static final long serialVersionUID = -6341668077370231153L;
