@@ -374,7 +374,6 @@ public class DefaultStatisticalCategoryDataset<R extends Comparable<R>,
         this.data.addObject(item, rowKey, columnKey);
 
         double m = Double.NaN;
-        double sd = stdeviation(standardDeviation);
 		if (mean != null) {
             m = mean.doubleValue();
         }
@@ -394,43 +393,71 @@ public class DefaultStatisticalCategoryDataset<R extends Comparable<R>,
             updateBounds();
         }
         else {
-            if (!Double.isNaN(m)) {
-                if (Double.isNaN(this.maximumRangeValue)
-                        || m > this.maximumRangeValue) {
-                    this.maximumRangeValue = m;
-                    this.maximumRangeValueRow = r;
-                    this.maximumRangeValueColumn = c;
-                }
-            }
-
-            if (!Double.isNaN(m + sd)) {
-                if (Double.isNaN(this.maximumRangeValueIncStdDev)
-                        || (m + sd) > this.maximumRangeValueIncStdDev) {
-                    this.maximumRangeValueIncStdDev = m + sd;
-                    this.maximumRangeValueIncStdDevRow = r;
-                    this.maximumRangeValueIncStdDevColumn = c;
-                }
-            }
-
-            if (!Double.isNaN(m)) {
-                if (Double.isNaN(this.minimumRangeValue)
-                        || m < this.minimumRangeValue) {
-                    this.minimumRangeValue = m;
-                    this.minimumRangeValueRow = r;
-                    this.minimumRangeValueColumn = c;
-                }
-            }
-
-            if (!Double.isNaN(m - sd)) {
-                if (Double.isNaN(this.minimumRangeValueIncStdDev)
-                        || (m - sd) < this.minimumRangeValueIncStdDev) {
-                    this.minimumRangeValueIncStdDev = m - sd;
-                    this.minimumRangeValueIncStdDevRow = r;
-                    this.minimumRangeValueIncStdDevColumn = c;
-                }
-            }
+        	setMaximumRangeValues(m, r, c, standardDeviation);
+        	setMinimumRangeValues(m, r, c, standardDeviation);
         }
         fireDatasetChanged();
+    }
+    
+    /**
+     * Set the maximum value of the range
+     *
+     * @param mean  the mean.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     * @param standardDeviation  the standard deviation.
+     */
+    public void setMaximumRangeValues(double mean, int rowKey, int columnKey, Number standardDeviation) {
+        double sd = stdeviation(standardDeviation);
+
+	    if (!Double.isNaN(mean)) {
+	        if (Double.isNaN(this.maximumRangeValue)
+	                || mean > this.maximumRangeValue) {
+	            this.maximumRangeValue = mean;
+	            this.maximumRangeValueRow = rowKey;
+	            this.maximumRangeValueColumn = columnKey;
+	        }
+	    }
+	
+	    if (!Double.isNaN(mean + sd)) {
+	        if (Double.isNaN(this.maximumRangeValueIncStdDev)
+	                || (mean + sd) > this.maximumRangeValueIncStdDev) {
+	            this.maximumRangeValueIncStdDev = mean + sd;
+	            this.maximumRangeValueIncStdDevRow = rowKey;
+	            this.maximumRangeValueIncStdDevColumn = columnKey;
+	        }
+	    }
+    }
+    
+    
+    /**
+     * Set the minimum value of the range
+     *
+     * @param mean  the mean.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     * @param standardDeviation  the standard deviation.
+     */
+    public void setMinimumRangeValues(double mean, int rowKey, int columnKey, Number standardDeviation) {
+        double sd = stdeviation(standardDeviation);
+	
+	    if (!Double.isNaN(mean)) {
+	        if (Double.isNaN(this.minimumRangeValue)
+	                || mean < this.minimumRangeValue) {
+	            this.minimumRangeValue = mean;
+	            this.minimumRangeValueRow = rowKey;
+	            this.minimumRangeValueColumn = columnKey;
+	        }
+	    }
+	
+	    if (!Double.isNaN(mean - sd)) {
+	        if (Double.isNaN(this.minimumRangeValueIncStdDev)
+	                || (mean - sd) < this.minimumRangeValueIncStdDev) {
+	            this.minimumRangeValueIncStdDev = mean - sd;
+	            this.minimumRangeValueIncStdDevRow = rowKey;
+	            this.minimumRangeValueIncStdDevColumn = columnKey;
+	        }
+	    }
     }
 
     /**
@@ -591,68 +618,118 @@ public class DefaultStatisticalCategoryDataset<R extends Comparable<R>,
 
                 if (!Double.isNaN(m)) {
 
-                    // update the max value
-                    if (Double.isNaN(this.maximumRangeValue)) {
-                        this.maximumRangeValue = m;
-                        this.maximumRangeValueRow = r;
-                        this.maximumRangeValueColumn = c;
-                    }
-                    else {
-                        if (m > this.maximumRangeValue) {
-                            this.maximumRangeValue = m;
-                            this.maximumRangeValueRow = r;
-                            this.maximumRangeValueColumn = c;
-                        }
-                    }
-
+                	// update the max value
+                	updateMaximumRangeValues(m, r, c);
                     // update the min value
-                    if (Double.isNaN(this.minimumRangeValue)) {
-                        this.minimumRangeValue = m;
-                        this.minimumRangeValueRow = r;
-                        this.minimumRangeValueColumn = c;
-                    }
-                    else {
-                        if (m < this.minimumRangeValue) {
-                            this.minimumRangeValue = m;
-                            this.minimumRangeValueRow = r;
-                            this.minimumRangeValueColumn = c;
-                        }
-                    }
+                	updateMinimumRangeValues(m, r, c);
+
 
                     if (!Double.isNaN(sd)) {
                         // update the max value
-                        if (Double.isNaN(this.maximumRangeValueIncStdDev)) {
-                            this.maximumRangeValueIncStdDev = m + sd;
-                            this.maximumRangeValueIncStdDevRow = r;
-                            this.maximumRangeValueIncStdDevColumn = c;
-                        }
-                        else {
-                            if (m + sd > this.maximumRangeValueIncStdDev) {
-                                this.maximumRangeValueIncStdDev = m + sd;
-                                this.maximumRangeValueIncStdDevRow = r;
-                                this.maximumRangeValueIncStdDevColumn = c;
-                            }
-                        }
-
+                    	updateMaximumRangeValuesIncStdDev(m, r, c, sd);
                         // update the min value
-                        if (Double.isNaN(this.minimumRangeValueIncStdDev)) {
-                            this.minimumRangeValueIncStdDev = m - sd;
-                            this.minimumRangeValueIncStdDevRow = r;
-                            this.minimumRangeValueIncStdDevColumn = c;
-                        }
-                        else {
-                            if (m - sd < this.minimumRangeValueIncStdDev) {
-                                this.minimumRangeValueIncStdDev = m - sd;
-                                this.minimumRangeValueIncStdDevRow = r;
-                                this.minimumRangeValueIncStdDevColumn = c;
-                            }
-                        }
+                    	updateMinimumRangeValuesIncStdDev(m, r, c, sd);
+
+
                     }
                 }
             }
         }
+    }  
+    
+    /**
+     * Update the maximum range value
+     *
+     * @param mean  the mean.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     */
+    public void updateMaximumRangeValues(double mean, int rowKey, int columnKey) {
+	    if (Double.isNaN(this.maximumRangeValue)) {
+	        this.maximumRangeValue = mean;
+	        this.maximumRangeValueRow = rowKey;
+	        this.maximumRangeValueColumn = columnKey;
+	    }
+	    else {
+	        if (mean > this.maximumRangeValue) {
+	            this.maximumRangeValue = mean;
+	            this.maximumRangeValueRow = rowKey;
+	            this.maximumRangeValueColumn = columnKey;
+	        }
+	    }
     }
-
+      
+    /**
+     * Update the minimum range value 
+     *
+     * @param mean  the mean.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     */
+    public void updateMinimumRangeValues(double mean, int rowKey, int columnKey) {
+	    if (Double.isNaN(this.minimumRangeValue)) {
+	        this.minimumRangeValue = mean;
+	        this.minimumRangeValueRow = rowKey;
+	        this.minimumRangeValueColumn = columnKey;
+	    }
+	    else {
+	        if (mean < this.minimumRangeValue) {
+	            this.minimumRangeValue = mean;
+	            this.minimumRangeValueRow = rowKey;
+	            this.minimumRangeValueColumn = columnKey;
+	        }
+	    }
+    }
+    
+    /**
+     * Update the maximum range value (including the standard
+     * deviation)
+     *
+     * @param mean  the mean.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     * @param sd  the standard deviation.
+     */
+    public void updateMaximumRangeValuesIncStdDev(double mean, int rowKey, int columnKey, double sd) {
+	    if (Double.isNaN(this.maximumRangeValueIncStdDev)) {
+	        this.maximumRangeValueIncStdDev = mean + sd;
+	        this.maximumRangeValueIncStdDevRow = rowKey;
+	        this.maximumRangeValueIncStdDevColumn = columnKey;
+	    }
+	    else {
+	        if (mean + sd > this.maximumRangeValueIncStdDev) {
+	            this.maximumRangeValueIncStdDev = mean + sd;
+	            this.maximumRangeValueIncStdDevRow = rowKey;
+	            this.maximumRangeValueIncStdDevColumn = columnKey;
+	        }
+	    }
+    }
+    
+    /**
+     * Update the minimum range value (including the standard
+     * deviation)
+     *
+     * @param mean  the mean.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     * @param sd  the standard deviation.
+     */
+    public void updateMinimumRangeValuesIncStdDev(double mean, int rowKey, int columnKey, double sd) {
+	    if (Double.isNaN(this.minimumRangeValueIncStdDev)) {
+	        this.minimumRangeValueIncStdDev = mean - sd;
+	        this.minimumRangeValueIncStdDevRow = rowKey;
+	        this.minimumRangeValueIncStdDevColumn = columnKey;
+	    }
+	    else {
+	        if (mean - sd < this.minimumRangeValueIncStdDev) {
+	            this.minimumRangeValueIncStdDev = mean - sd;
+	            this.minimumRangeValueIncStdDevRow = rowKey;
+	            this.minimumRangeValueIncStdDevColumn = columnKey;
+	        }
+	    }
+    }
+    
+    
     /**
      * Returns the minimum y-value in the dataset.
      *

@@ -80,13 +80,13 @@ import org.jfree.data.xy.XYZDataset;
  */
 public final class DatasetUtils {
 
-    /**
+	/**
      * Private constructor for non-instanceability.
      */
     private DatasetUtils() {
         // now try to instantiate this ;-)
     }
-
+    
     /**
      * Calculates the total of all the values in a {@link PieDataset}.  If
      * the dataset contains negative or {@code null} values, they are
@@ -672,51 +672,99 @@ public final class DatasetUtils {
         Args.nullNotPermitted(dataset, "dataset");
         double minimum = Double.POSITIVE_INFINITY;
         double maximum = Double.NEGATIVE_INFINITY;
+        if (includeInterval && dataset instanceof IntervalXYDataset) {
+            return iterateDomainIntervalXYDataset(dataset, minimum, maximum);
+        } else {
+        	return iterateDomainXYDataset(dataset, minimum, maximum);
+        }
+    }
+    
+    /**
+     * Iterates over the items in Interval XY Dataset to find
+     * the range of x-values.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     *
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The range (possibly {@code null}).
+     */
+    public static <S extends Comparable<S>> Range iterateDomainIntervalXYDataset(
+            XYDataset<S> dataset, double minimum, double maximum) {
+	    @SuppressWarnings("unchecked")
+	    IntervalXYDataset<S> intervalXYData = (IntervalXYDataset) dataset;
         int seriesCount = dataset.getSeriesCount();
         double lvalue, uvalue;
-        if (includeInterval && dataset instanceof IntervalXYDataset) {
-            @SuppressWarnings("unchecked")
-            IntervalXYDataset<S> intervalXYData = (IntervalXYDataset) dataset;
-            for (int series = 0; series < seriesCount; series++) {
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double value = intervalXYData.getXValue(series, item);
-                    lvalue = intervalXYData.getStartXValue(series, item);
-                    uvalue = intervalXYData.getEndXValue(series, item);
-                    if (!Double.isNaN(value)) {
-                        minimum = Math.min(minimum, value);
-                        maximum = Math.max(maximum, value);
-                    }
-                    if (!Double.isNaN(lvalue)) {
-                        minimum = Math.min(minimum, lvalue);
-                        maximum = Math.max(maximum, lvalue);
-                    }
-                    if (!Double.isNaN(uvalue)) {
-                        minimum = Math.min(minimum, uvalue);
-                        maximum = Math.max(maximum, uvalue);
-                    }
-                }
-            }
-        }
-        else {
-            for (int series = 0; series < seriesCount; series++) {
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    lvalue = dataset.getXValue(series, item);
-                    uvalue = lvalue;
-                    if (!Double.isNaN(lvalue)) {
-                        minimum = Math.min(minimum, lvalue);
-                        maximum = Math.max(maximum, uvalue);
-                    }
-                }
-            }
-        }
-        if (minimum > maximum) {
-            return null;
-        }
-        else {
-            return new Range(minimum, maximum);
-        }
+	    for (int series = 0; series < seriesCount; series++) {
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double value = intervalXYData.getXValue(series, item);
+	            lvalue = intervalXYData.getStartXValue(series, item);
+	            uvalue = intervalXYData.getEndXValue(series, item);
+	            if (!Double.isNaN(value)) {
+	                minimum = Math.min(minimum, value);
+	                maximum = Math.max(maximum, value);
+	            }
+	            if (!Double.isNaN(lvalue)) {
+	                minimum = Math.min(minimum, lvalue);
+	                maximum = Math.max(maximum, lvalue);
+	            }
+	            if (!Double.isNaN(uvalue)) {
+	                minimum = Math.min(minimum, uvalue);
+	                maximum = Math.max(maximum, uvalue);
+	            }
+	        }
+	    }
+	    return createDomainRange(minimum, maximum);
+    }
+    
+    /**
+     * Iterates over the items in an XY Dataset to find
+     * the range of x-values.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     *
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The range (possibly {@code null}).
+     */
+    public static <S extends Comparable<S>> Range iterateDomainXYDataset(
+            XYDataset<S> dataset, double minimum, double maximum) {
+        int seriesCount = dataset.getSeriesCount();
+        double lvalue, uvalue;
+	    for (int series = 0; series < seriesCount; series++) {
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            lvalue = dataset.getXValue(series, item);
+	            uvalue = lvalue;
+	            if (!Double.isNaN(lvalue)) {
+	                minimum = Math.min(minimum, lvalue);
+	                maximum = Math.max(maximum, uvalue);
+	            }
+	        }
+	    }
+	    return createDomainRange(minimum, maximum);
+    }
+    
+    /**
+     * Create the range bounds.
+     *
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     *
+     * @return The range (possibly {@code null}).
+     */
+    private static Range createDomainRange(double minimum, double maximum) {
+	    if (minimum > maximum) {
+	        return null;
+	    }
+	    else {
+	        return new Range(minimum, maximum);
+	    }
     }
 
     /**
@@ -909,61 +957,69 @@ public final class DatasetUtils {
             boolean includeInterval) {
         double minimum = Double.POSITIVE_INFINITY;
         double maximum = Double.NEGATIVE_INFINITY;
-        int rowCount = dataset.getRowCount();
-        int columnCount = dataset.getColumnCount();
+
         if (includeInterval && dataset instanceof IntervalCategoryDataset) {
             // handle the special case where the dataset has y-intervals that
             // we want to measure
-            @SuppressWarnings("unchecked")
-            IntervalCategoryDataset<R, C> icd = (IntervalCategoryDataset) dataset;
-            Number value, lvalue, uvalue;
-            for (int row = 0; row < rowCount; row++) {
-                for (int column = 0; column < columnCount; column++) {
-                    value = icd.getValue(row, column);
-                    double v;
-                    if ((value != null)
-                            && !Double.isNaN(v = value.doubleValue())) {
-                        minimum = Math.min(v, minimum);
-                        maximum = Math.max(v, maximum);
-                    }
-                    lvalue = icd.getStartValue(row, column);
-                    if (lvalue != null
-                            && !Double.isNaN(v = lvalue.doubleValue())) {
-                        minimum = Math.min(v, minimum);
-                        maximum = Math.max(v, maximum);
-                    }
-                    uvalue = icd.getEndValue(row, column);
-                    if (uvalue != null
-                            && !Double.isNaN(v = uvalue.doubleValue())) {
-                        minimum = Math.min(v, minimum);
-                        maximum = Math.max(v, maximum);
-                    }
-                }
-            }
-        }
-        else {
+        	return iterateIntervalCategoryDataset(dataset, minimum, maximum);
+        } else {
             // handle the standard case (plain CategoryDataset)
-            for (int row = 0; row < rowCount; row++) {
-                for (int column = 0; column < columnCount; column++) {
-                    Number value = dataset.getValue(row, column);
-                    if (value != null) {
-                        double v = value.doubleValue();
-                        if (!Double.isNaN(v)) {
-                            minimum = Math.min(minimum, v);
-                            maximum = Math.max(maximum, v);
-                        }
+        	return iterateCategoryDataset(dataset, minimum, maximum);
+        }
+ 
+    }
+        
+    private static <R extends Comparable<R>, C extends Comparable<C>> Range 
+    	iterateIntervalCategoryDataset(CategoryDataset<R, C> dataset, double minimum, double maximum) {
+        @SuppressWarnings("unchecked")
+        IntervalCategoryDataset<R, C> icd = (IntervalCategoryDataset) dataset;
+        Number value, lvalue, uvalue;
+        int rowCount = dataset.getRowCount();
+        int columnCount = dataset.getColumnCount();
+        for (int row = 0; row < rowCount; row++) {
+            for (int column = 0; column < columnCount; column++) {
+                value = icd.getValue(row, column);
+                double v;
+                if ((value != null)
+                        && !Double.isNaN(v = value.doubleValue())) {
+                    minimum = Math.min(v, minimum);
+                    maximum = Math.max(v, maximum);
+                }
+                lvalue = icd.getStartValue(row, column);
+                if (lvalue != null
+                        && !Double.isNaN(v = lvalue.doubleValue())) {
+                    minimum = Math.min(v, minimum);
+                    maximum = Math.max(v, maximum);
+                }
+                uvalue = icd.getEndValue(row, column);
+                if (uvalue != null
+                        && !Double.isNaN(v = uvalue.doubleValue())) {
+                    minimum = Math.min(v, minimum);
+                    maximum = Math.max(v, maximum);
+                }
+            }
+        }
+        return createRangeBounds(minimum, maximum);
+    }
+    
+    private static <R extends Comparable<R>, C extends Comparable<C>> Range 
+    	iterateCategoryDataset(CategoryDataset<R, C> dataset, double minimum, double maximum) {   
+        int rowCount = dataset.getRowCount();
+        int columnCount = dataset.getColumnCount();
+        for (int row = 0; row < rowCount; row++) {
+            for (int column = 0; column < columnCount; column++) {
+                Number value = dataset.getValue(row, column);
+                if (value != null) {
+                    double v = value.doubleValue();
+                    if (!Double.isNaN(v)) {
+                        minimum = Math.min(minimum, v);
+                        maximum = Math.max(maximum, v);
                     }
                 }
             }
         }
-        if (minimum == Double.POSITIVE_INFINITY) {
-            return null;
-        }
-        else {
-            return new Range(minimum, maximum);
-        }
+        return createRangeBounds(minimum, maximum);
     }
-
     /**
      * Iterates over the data item of the category dataset to find
      * the range bounds.
@@ -986,130 +1042,243 @@ public final class DatasetUtils {
 
         Args.nullNotPermitted(dataset, "dataset");
         Args.nullNotPermitted(visibleSeriesKeys, "visibleSeriesKeys");
-
+        
         double minimum = Double.POSITIVE_INFINITY;
         double maximum = Double.NEGATIVE_INFINITY;
-        int columnCount = dataset.getColumnCount();
+        
         if (includeInterval
                 && dataset instanceof BoxAndWhiskerCategoryDataset) {
             // handle special case of BoxAndWhiskerDataset
-            @SuppressWarnings("unchecked")
-            BoxAndWhiskerCategoryDataset<R, C> bx
-                    = (BoxAndWhiskerCategoryDataset) dataset;
-            for (R seriesKey : visibleSeriesKeys) {
-                int series = dataset.getRowIndex(seriesKey);
-                int itemCount = dataset.getColumnCount();
-                for (int item = 0; item < itemCount; item++) {
-                    Number lvalue = bx.getMinRegularValue(series, item);
-                    if (lvalue == null) {
-                        lvalue = bx.getValue(series, item);
-                    }
-                    Number uvalue = bx.getMaxRegularValue(series, item);
-                    if (uvalue == null) {
-                        uvalue = bx.getValue(series, item);
-                    }
-                    if (lvalue != null) {
-                        minimum = Math.min(minimum, lvalue.doubleValue());
-                    }
-                    if (uvalue != null) {
-                        maximum = Math.max(maximum, uvalue.doubleValue());
-                    }
-                }
-            }
+        	return iterateBoxAndWhiskerCategoryDataset(dataset, visibleSeriesKeys, minimum, maximum);
         }
         else if (includeInterval
                 && dataset instanceof IntervalCategoryDataset) {
             // handle the special case where the dataset has y-intervals that
             // we want to measure
-            @SuppressWarnings("unchecked")
-            IntervalCategoryDataset<R, C> icd = (IntervalCategoryDataset) dataset;
-            Number lvalue, uvalue;
-            for (R seriesKey : visibleSeriesKeys) {
-                int series = dataset.getRowIndex(seriesKey);
-                for (int column = 0; column < columnCount; column++) {
-                    lvalue = icd.getStartValue(series, column);
-                    uvalue = icd.getEndValue(series, column);
-                    if (lvalue != null && !Double.isNaN(lvalue.doubleValue())) {
-                        minimum = Math.min(minimum, lvalue.doubleValue());
-                    }
-                    if (uvalue != null && !Double.isNaN(uvalue.doubleValue())) {
-                        maximum = Math.max(maximum, uvalue.doubleValue());
-                    }
-                }
-            }
+        	return iterateIntervalCategoryDataset(dataset, visibleSeriesKeys, minimum, maximum);
         }
         else if (includeInterval
                 && dataset instanceof MultiValueCategoryDataset) {
             // handle the special case where the dataset has y-intervals that
             // we want to measure
-            @SuppressWarnings("unchecked")
-            MultiValueCategoryDataset<R, C> mvcd
-                    = (MultiValueCategoryDataset) dataset;
-            for (R seriesKey : visibleSeriesKeys) {
-                int series = dataset.getRowIndex(seriesKey);
-                for (int column = 0; column < columnCount; column++) {
-                    List<? extends Number> values = mvcd.getValues(series, column);
-                    for (Number n : values) {
-                        double v = n.doubleValue();
-                        if (!Double.isNaN(v)){
-                            minimum = Math.min(minimum, v);
-                            maximum = Math.max(maximum, v);
-                        }
-                    }
-                }
-            }
+        	return iterateMultiValueCategoryDataset(dataset, visibleSeriesKeys, minimum, maximum);
         }
         else if (includeInterval 
                 && dataset instanceof StatisticalCategoryDataset) {
             // handle the special case where the dataset has y-intervals that
             // we want to measure
-            @SuppressWarnings("unchecked")
-            StatisticalCategoryDataset<R, C> scd
-                    = (StatisticalCategoryDataset) dataset;
-            for (R seriesKey : visibleSeriesKeys) {
-                int series = dataset.getRowIndex(seriesKey);
-                for (int column = 0; column < columnCount; column++) {
-                    Number meanN = scd.getMeanValue(series, column);
-                    if (meanN != null) {
-                        double std = 0.0;
-                        Number stdN = scd.getStdDevValue(series, column);
-                        if (stdN != null) {
-                            std = stdN.doubleValue();
-                            if (Double.isNaN(std)) {
-                                std = 0.0;
-                            }
-                        }
-                        double mean = meanN.doubleValue();
-                        if (!Double.isNaN(mean)) {
-                            minimum = Math.min(minimum, mean - std);
-                            maximum = Math.max(maximum, mean + std);
-                        }
-                    }
-                }
-            }
+        	return iterateStatisticalCategoryDataset(dataset, visibleSeriesKeys, minimum, maximum);
         }
         else {
             // handle the standard case (plain CategoryDataset)
-            for (R seriesKey : visibleSeriesKeys) {
-                int series = dataset.getRowIndex(seriesKey);
-                for (int column = 0; column < columnCount; column++) {
-                    Number value = dataset.getValue(series, column);
-                    if (value != null) {
-                        double v = value.doubleValue();
-                        if (!Double.isNaN(v)) {
-                            minimum = Math.min(minimum, v);
-                            maximum = Math.max(maximum, v);
-                        }
+        	return iterateCategoryDataset(dataset, visibleSeriesKeys, minimum, maximum);
+        }
+    }  
+    
+    /**
+     * Iterates over the data item of the Box And Whisker Category Dataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The range (possibly {@code null}).
+     * 
+     * @param <R>  the type for the row keys.
+     * @param <C>  the type for the column keys.
+     */
+    private static <R extends Comparable<R>, C extends Comparable<C>>  
+    	Range iterateBoxAndWhiskerCategoryDataset(CategoryDataset<R, C>  dataset, 
+    			List<R> visibleSeriesKeys, double minimum, double maximum) {
+    	@SuppressWarnings("unchecked")
+        BoxAndWhiskerCategoryDataset<R, C> bx  = (BoxAndWhiskerCategoryDataset) dataset;
+        for (R seriesKey : visibleSeriesKeys) {
+            int series = dataset.getRowIndex(seriesKey);
+            int itemCount = dataset.getColumnCount();
+            for (int item = 0; item < itemCount; item++) {
+                Number lvalue = bx.getMinRegularValue(series, item);
+                if (lvalue == null) {
+                    lvalue = bx.getValue(series, item);
+                }
+                Number uvalue = bx.getMaxRegularValue(series, item);
+                if (uvalue == null) {
+                    uvalue = bx.getValue(series, item);
+                }
+                if (lvalue != null) {
+                    minimum = Math.min(minimum, lvalue.doubleValue());
+                }
+                if (uvalue != null) {
+                    maximum = Math.max(maximum, uvalue.doubleValue());
+                }
+            }
+        }
+        return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Iterates over the data item of the Interval Category Dataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The range (possibly {@code null}).
+     * 
+     * @param <R>  the type for the row keys.
+     * @param <C>  the type for the column keys.
+     */
+    private static <R extends Comparable<R>, C extends Comparable<C>>  
+		Range iterateIntervalCategoryDataset(CategoryDataset<R, C>  dataset, 
+			List<R> visibleSeriesKeys, double minimum, double maximum) {
+    	@SuppressWarnings("unchecked")
+        IntervalCategoryDataset<R, C> icd = (IntervalCategoryDataset) dataset;
+        Number lvalue, uvalue;
+        for (R seriesKey : visibleSeriesKeys) {
+            int series = dataset.getRowIndex(seriesKey);
+            int columnCount = dataset.getColumnCount();
+            for (int column = 0; column < columnCount; column++) {
+                lvalue = icd.getStartValue(series, column);
+                uvalue = icd.getEndValue(series, column);
+                if (lvalue != null && !Double.isNaN(lvalue.doubleValue())) {
+                    minimum = Math.min(minimum, lvalue.doubleValue());
+                }
+                if (uvalue != null && !Double.isNaN(uvalue.doubleValue())) {
+                    maximum = Math.max(maximum, uvalue.doubleValue());
+                }
+            }
+        }
+        return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Iterates over the data item of the Multi Value Category Dataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The range (possibly {@code null}).
+     * 
+     * @param <R>  the type for the row keys.
+     * @param <C>  the type for the column keys.
+     */
+    private static <R extends Comparable<R>, C extends Comparable<C>>  
+    	Range iterateMultiValueCategoryDataset(CategoryDataset<R, C>  dataset,
+			List<R> visibleSeriesKeys, double minimum, double maximum) {
+        @SuppressWarnings("unchecked")
+        MultiValueCategoryDataset<R, C> mvcd = (MultiValueCategoryDataset) dataset;
+        for (R seriesKey : visibleSeriesKeys) {
+            int series = dataset.getRowIndex(seriesKey);
+            int columnCount = dataset.getColumnCount();
+            for (int column = 0; column < columnCount; column++) {
+                List<? extends Number> values = mvcd.getValues(series, column);
+                for (Number n : values) {
+                    double v = n.doubleValue();
+                    if (!Double.isNaN(v)){
+                        minimum = Math.min(minimum, v);
+                        maximum = Math.max(maximum, v);
                     }
                 }
             }
         }
-        if (minimum == Double.POSITIVE_INFINITY) {
-            return null;
+        return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Iterates over the data item of the Statistical Category Dataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The range (possibly {@code null}).
+     * 
+     * @param <R>  the type for the row keys.
+     * @param <C>  the type for the column keys.
+     */
+    private static <R extends Comparable<R>, C extends Comparable<C>>  
+    	Range iterateStatisticalCategoryDataset(CategoryDataset<R, C>  dataset, 
+			List<R> visibleSeriesKeys, double minimum, double maximum) {
+        @SuppressWarnings("unchecked")
+        StatisticalCategoryDataset<R, C> scd
+                = (StatisticalCategoryDataset) dataset;
+        for (R seriesKey : visibleSeriesKeys) {
+            int series = dataset.getRowIndex(seriesKey);
+            int columnCount = dataset.getColumnCount();
+            for (int column = 0; column < columnCount; column++) {
+                Number meanN = scd.getMeanValue(series, column);
+                if (meanN != null) {
+                    double std = 0.0;
+                    Number stdN = scd.getStdDevValue(series, column);
+                    if (stdN != null) {
+                        std = stdN.doubleValue();
+                        if (Double.isNaN(std)) {
+                            std = 0.0;
+                        }
+                    }
+                    double mean = meanN.doubleValue();
+                    if (!Double.isNaN(mean)) {
+                        minimum = Math.min(minimum, mean - std);
+                        maximum = Math.max(maximum, mean + std);
+                    }
+                }
+            }
         }
-        else {
-            return new Range(minimum, maximum);
+        return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Iterates over the data item of the Category Dataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The range (possibly {@code null}).
+     * 
+     * @param <R>  the type for the row keys.
+     * @param <C>  the type for the column keys.
+     */
+    private static <R extends Comparable<R>, C extends Comparable<C>>  
+     Range iterateCategoryDataset(CategoryDataset<R, C>  dataset, 
+			List<R> visibleSeriesKeys, double minimum, double maximum) {
+        for (R seriesKey : visibleSeriesKeys) {
+            int series = dataset.getRowIndex(seriesKey);
+            int columnCount = dataset.getColumnCount();
+            for (int column = 0; column < columnCount; column++) {
+                Number value = dataset.getValue(series, column);
+                if (value != null) {
+                    double v = value.doubleValue();
+                    if (!Double.isNaN(v)) {
+                        minimum = Math.min(minimum, v);
+                        maximum = Math.max(maximum, v);
+                    }
+                }
+            }
         }
+        return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Create the range bounds.
+     *
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     *
+     * @return The range (possibly {@code null}).
+     */
+    private static Range createRangeBounds(double minimum, double maximum) {
+	    if (minimum == Double.POSITIVE_INFINITY) {
+	        return null;
+	    }
+	    else {
+	        return new Range(minimum, maximum);
+	    }
     }
 
     /**
@@ -1148,72 +1317,121 @@ public final class DatasetUtils {
             XYDataset<S> dataset, boolean includeInterval) {
         double minimum = Double.POSITIVE_INFINITY;
         double maximum = Double.NEGATIVE_INFINITY;
-        int seriesCount = dataset.getSeriesCount();
 
         // handle three cases by dataset type
         if (includeInterval && dataset instanceof IntervalXYDataset) {
             // handle special case of IntervalXYDataset
-            @SuppressWarnings("unchecked")
-            IntervalXYDataset<S> ixyd = (IntervalXYDataset) dataset;
-            for (int series = 0; series < seriesCount; series++) {
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double value = ixyd.getYValue(series, item);
-                    double lvalue = ixyd.getStartYValue(series, item);
-                    double uvalue = ixyd.getEndYValue(series, item);
-                    if (!Double.isNaN(value)) {
-                        minimum = Math.min(minimum, value);
-                        maximum = Math.max(maximum, value);
-                    }
-                    if (!Double.isNaN(lvalue)) {
-                        minimum = Math.min(minimum, lvalue);
-                        maximum = Math.max(maximum, lvalue);
-                    }
-                    if (!Double.isNaN(uvalue)) {
-                        minimum = Math.min(minimum, uvalue);
-                        maximum = Math.max(maximum, uvalue);
-                    }
-                }
-            }
+        	return iterateIntervalXYDataset(dataset, minimum, maximum);
         }
         else if (includeInterval && dataset instanceof OHLCDataset) {
             // handle special case of OHLCDataset
-            OHLCDataset ohlc = (OHLCDataset) dataset;
-            for (int series = 0; series < seriesCount; series++) {
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double lvalue = ohlc.getLowValue(series, item);
-                    double uvalue = ohlc.getHighValue(series, item);
-                    if (!Double.isNaN(lvalue)) {
-                        minimum = Math.min(minimum, lvalue);
-                    }
-                    if (!Double.isNaN(uvalue)) {
-                        maximum = Math.max(maximum, uvalue);
-                    }
-                }
-            }
+        	return iterateOHLCDataset(dataset, minimum, maximum);
         }
         else {
             // standard case - plain XYDataset
-            for (int series = 0; series < seriesCount; series++) {
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double value = dataset.getYValue(series, item);
-                    if (!Double.isNaN(value)) {
-                        minimum = Math.min(minimum, value);
-                        maximum = Math.max(maximum, value);
-                    }
-                }
-            }
-        }
-        if (minimum == Double.POSITIVE_INFINITY) {
-            return null;
-        }
-        else {
-            return new Range(minimum, maximum);
+        	return iterateXYDataset(dataset, minimum, maximum);
         }
     }
+    
+    /**
+     * Iterates over the data items of the Interval XYDataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).     
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The range (possibly {@code null}).
+     *
+     */
+    private static <S extends Comparable<S>> Range iterateIntervalXYDataset(
+            XYDataset<S> dataset, double minimum, double maximum) {
+	    @SuppressWarnings("unchecked")
+	    IntervalXYDataset<S> ixyd = (IntervalXYDataset) dataset;
+        int seriesCount = dataset.getSeriesCount();
+	    for (int series = 0; series < seriesCount; series++) {
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double value = ixyd.getYValue(series, item);
+	            double lvalue = ixyd.getStartYValue(series, item);
+	            double uvalue = ixyd.getEndYValue(series, item);
+	            if (!Double.isNaN(value)) {
+	                minimum = Math.min(minimum, value);
+	                maximum = Math.max(maximum, value);
+	            }
+	            if (!Double.isNaN(lvalue)) {
+	                minimum = Math.min(minimum, lvalue);
+	                maximum = Math.max(maximum, lvalue);
+	            }
+	            if (!Double.isNaN(uvalue)) {
+	                minimum = Math.min(minimum, uvalue);
+	                maximum = Math.max(maximum, uvalue);
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
 
+    /**
+     * Iterates over the data items of the OHLC Dataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).     
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The range (possibly {@code null}).
+     *
+     */
+    private static <S extends Comparable<S>> Range iterateOHLCDataset(
+            XYDataset<S> dataset, double minimum, double maximum) {
+	    OHLCDataset ohlc = (OHLCDataset) dataset;
+        int seriesCount = dataset.getSeriesCount();
+	    for (int series = 0; series < seriesCount; series++) {
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double lvalue = ohlc.getLowValue(series, item);
+	            double uvalue = ohlc.getHighValue(series, item);
+	            if (!Double.isNaN(lvalue)) {
+	                minimum = Math.min(minimum, lvalue);
+	            }
+	            if (!Double.isNaN(uvalue)) {
+	                maximum = Math.max(maximum, uvalue);
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Iterates over the data items of the XYDataset to find
+     * the range bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).     
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The range (possibly {@code null}).
+     *
+     */
+    private static <S extends Comparable<S>> Range iterateXYDataset(
+            XYDataset<S> dataset, double minimum, double maximum) {
+        int seriesCount = dataset.getSeriesCount();
+	    for (int series = 0; series < seriesCount; series++) {
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double value = dataset.getYValue(series, item);
+	            if (!Double.isNaN(value)) {
+	                minimum = Math.min(minimum, value);
+	                maximum = Math.max(maximum, value);
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
     /**
      * Returns the range of values in the z-dimension for the dataset. This
      * method is the partner for the {@link #findRangeBounds(XYDataset)}
@@ -1307,53 +1525,84 @@ public final class DatasetUtils {
             XYZDataset<S> dataset, boolean includeInterval) {
         double minimum = Double.POSITIVE_INFINITY;
         double maximum = Double.NEGATIVE_INFINITY;
-        int seriesCount = dataset.getSeriesCount();
-
+        
         if (includeInterval && dataset instanceof IntervalXYZDataset) {
-            @SuppressWarnings("unchecked")
-            IntervalXYZDataset<S> intervalDataset = (IntervalXYZDataset) dataset;
-            for (int series = 0; series < seriesCount; series++) {
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    // first apply the z-value itself
-                    double value = dataset.getZValue(series, item);
-                    if (!Double.isNaN(value)) {
-                        minimum = Math.min(minimum, value);
-                        maximum = Math.max(maximum, value);
-                    }
-                    
-                    Number start = intervalDataset.getStartZValue(series, item);
-                    if (start != null && !Double.isNaN(start.doubleValue())) {
-                        minimum = Math.min(minimum, start.doubleValue());
-                        maximum = Math.max(maximum, start.doubleValue());                        
-                    }
-                    Number end = intervalDataset.getEndZValue(series, item);
-                    if (end != null && !Double.isNaN(end.doubleValue())) {
-                        minimum = Math.min(minimum, end.doubleValue());
-                        maximum = Math.max(maximum, end.doubleValue());                        
-                    }
-                }
-            }            
+        	return iterateIntervalXYZDataset(dataset, minimum, maximum);
         } else {
-            for (int series = 0; series < seriesCount; series++) {
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double value = dataset.getZValue(series, item);
-                    if (!Double.isNaN(value)) {
-                        minimum = Math.min(minimum, value);
-                        maximum = Math.max(maximum, value);
-                    }
-                }
-            }
-        }
+        	return iterateXYZDataset(dataset, minimum, maximum);
 
-        if (minimum == Double.POSITIVE_INFINITY) {
-            return null;
-        } else {
-            return new Range(minimum, maximum);
         }
     }
-
+    
+    /**
+     * Iterates over the data items of the Interval XYZ Dataset to find
+     * the z-dimension bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The range (possibly {@code null}).
+     */
+    public static <S extends Comparable<S>> Range iterateIntervalXYZDataset(
+            XYZDataset<S> dataset, double minimum, double maximum) {
+	    @SuppressWarnings("unchecked")
+	    IntervalXYZDataset<S> intervalDataset = (IntervalXYZDataset) dataset;
+        int seriesCount = dataset.getSeriesCount();
+	    for (int series = 0; series < seriesCount; series++) {
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            // first apply the z-value itself
+	            double value = dataset.getZValue(series, item);
+	            if (!Double.isNaN(value)) {
+	                minimum = Math.min(minimum, value);
+	                maximum = Math.max(maximum, value);
+	            }
+	            
+	            Number start = intervalDataset.getStartZValue(series, item);
+	            if (start != null && !Double.isNaN(start.doubleValue())) {
+	                minimum = Math.min(minimum, start.doubleValue());
+	                maximum = Math.max(maximum, start.doubleValue());                        
+	            }
+	            Number end = intervalDataset.getEndZValue(series, item);
+	            if (end != null && !Double.isNaN(end.doubleValue())) {
+	                minimum = Math.min(minimum, end.doubleValue());
+	                maximum = Math.max(maximum, end.doubleValue());                        
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Iterates over the data items of the XYZ Dataset to find
+     * the z-dimension bounds.
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * 
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The range (possibly {@code null}).
+     */
+    public static <S extends Comparable<S>> Range iterateXYZDataset(
+            XYZDataset<S> dataset, double minimum, double maximum) {
+        int seriesCount = dataset.getSeriesCount();
+	    for (int series = 0; series < seriesCount; series++) {
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double value = dataset.getZValue(series, item);
+	            if (!Double.isNaN(value)) {
+	                minimum = Math.min(minimum, value);
+	                maximum = Math.max(maximum, value);
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
+    
     /**
      * Returns the range of x-values in the specified dataset for the
      * data items belonging to the visible series.
@@ -1382,49 +1631,85 @@ public final class DatasetUtils {
 
         if (includeInterval && dataset instanceof IntervalXYDataset) {
             // handle special case of IntervalXYDataset
-            @SuppressWarnings("unchecked")
-            IntervalXYDataset<S> ixyd = (IntervalXYDataset) dataset;
-            for (S seriesKey : visibleSeriesKeys) {
-                int series = dataset.indexOf(seriesKey);
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double xvalue = ixyd.getXValue(series, item);
-                    double lvalue = ixyd.getStartXValue(series, item);
-                    double uvalue = ixyd.getEndXValue(series, item);
-                    if (!Double.isNaN(xvalue)) {
-                        minimum = Math.min(minimum, xvalue);
-                        maximum = Math.max(maximum, xvalue);
-                    }
-                    if (!Double.isNaN(lvalue)) {
-                        minimum = Math.min(minimum, lvalue);
-                    }
-                    if (!Double.isNaN(uvalue)) {
-                        maximum = Math.max(maximum, uvalue);
-                    }
-                }
-            }
+        	return iterateIntervalXYDataset(dataset, visibleSeriesKeys, minimum, maximum);
         } else {
             // standard case - plain XYDataset
-            for (S seriesKey : visibleSeriesKeys) {
-                int series = dataset.indexOf(seriesKey);
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double x = dataset.getXValue(series, item);
-                    if (!Double.isNaN(x)) {
-                        minimum = Math.min(minimum, x);
-                        maximum = Math.max(maximum, x);
-                    }
-                }
-            }
-        }
-
-        if (minimum == Double.POSITIVE_INFINITY) {
-            return null;
-        } else {
-            return new Range(minimum, maximum);
+        	return iterateXYDataset(dataset, visibleSeriesKeys, minimum, maximum);
         }
     }
-
+    
+    /**
+     * Returns the range of x-values in the Interval XY Dataset for the
+     * data items belonging to the visible series.
+     * 
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys ({@code null} not
+     *     permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * 
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The x-range (possibly {@code null}).
+     * 
+     */
+    private static <S extends Comparable<S>> Range iterateIntervalXYDataset(
+            XYDataset<S> dataset, List<S> visibleSeriesKeys, double minimum, double maximum) {
+	    @SuppressWarnings("unchecked")
+	    IntervalXYDataset<S> ixyd = (IntervalXYDataset) dataset;
+	    for (S seriesKey : visibleSeriesKeys) {
+	        int series = dataset.indexOf(seriesKey);
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double xvalue = ixyd.getXValue(series, item);
+	            double lvalue = ixyd.getStartXValue(series, item);
+	            double uvalue = ixyd.getEndXValue(series, item);
+	            if (!Double.isNaN(xvalue)) {
+	                minimum = Math.min(minimum, xvalue);
+	                maximum = Math.max(maximum, xvalue);
+	            }
+	            if (!Double.isNaN(lvalue)) {
+	                minimum = Math.min(minimum, lvalue);
+	            }
+	            if (!Double.isNaN(uvalue)) {
+	                maximum = Math.max(maximum, uvalue);
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
+    
+    /**
+     * Returns the range of x-values in the XY Dataset for the
+     * data items belonging to the visible series.
+     * 
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys ({@code null} not
+     *     permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * 
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The x-range (possibly {@code null}).
+     * 
+     */
+    private static <S extends Comparable<S>> Range iterateXYDataset(
+            XYDataset<S> dataset, List<S> visibleSeriesKeys, double minimum, double maximum) {
+	    for (S seriesKey : visibleSeriesKeys) {
+	        int series = dataset.indexOf(seriesKey);
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double x = dataset.getXValue(series, item);
+	            if (!Double.isNaN(x)) {
+	                minimum = Math.min(minimum, x);
+	                maximum = Math.max(maximum, x);
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
+    
     /**
      * Returns the range of y-values in the specified dataset for the
      * data items belonging to the visible series and with x-values in the
@@ -1458,96 +1743,172 @@ public final class DatasetUtils {
         // handle three cases by dataset type
         if (includeInterval && dataset instanceof OHLCDataset) {
             // handle special case of OHLCDataset
-            OHLCDataset ohlc = (OHLCDataset) dataset;
-            for (S seriesKey : visibleSeriesKeys) {
-                int series = dataset.indexOf(seriesKey);
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double x = ohlc.getXValue(series, item);
-                    if (xRange.contains(x)) {
-                        double lvalue = ohlc.getLowValue(series, item);
-                        double uvalue = ohlc.getHighValue(series, item);
-                        if (!Double.isNaN(lvalue)) {
-                            minimum = Math.min(minimum, lvalue);
-                        }
-                        if (!Double.isNaN(uvalue)) {
-                            maximum = Math.max(maximum, uvalue);
-                        }
-                    }
-                }
-            }
+        	return iterateOHLCDataset(dataset, visibleSeriesKeys, xRange, minimum, maximum);
         }
         else if (includeInterval && dataset instanceof BoxAndWhiskerXYDataset) {
             // handle special case of BoxAndWhiskerXYDataset
-            @SuppressWarnings("unchecked")
-            BoxAndWhiskerXYDataset<S> bx = (BoxAndWhiskerXYDataset) dataset;
-            for (S seriesKey : visibleSeriesKeys) {
-                int series = dataset.indexOf(seriesKey);
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double x = bx.getXValue(series, item);
-                    if (xRange.contains(x)) {
-                        Number lvalue = bx.getMinRegularValue(series, item);
-                        Number uvalue = bx.getMaxRegularValue(series, item);
-                        if (lvalue != null) {
-                            minimum = Math.min(minimum, lvalue.doubleValue());
-                        }
-                        if (uvalue != null) {
-                            maximum = Math.max(maximum, uvalue.doubleValue());
-                        }
-                    }
-                }
-            }
+        	return iterateBoxAndWhiskerXYDataset(dataset, visibleSeriesKeys, xRange, minimum, maximum);
         }
         else if (includeInterval && dataset instanceof IntervalXYDataset) {
             // handle special case of IntervalXYDataset
-            @SuppressWarnings("unchecked")
-            IntervalXYDataset<S> ixyd = (IntervalXYDataset) dataset;
-            for (S seriesKey : visibleSeriesKeys) {
-                int series = dataset.indexOf(seriesKey);
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double x = ixyd.getXValue(series, item);
-                    if (xRange.contains(x)) {
-                        double yvalue = ixyd.getYValue(series, item);
-                        double lvalue = ixyd.getStartYValue(series, item);
-                        double uvalue = ixyd.getEndYValue(series, item);
-                        if (!Double.isNaN(yvalue)) {
-                            minimum = Math.min(minimum, yvalue);
-                            maximum = Math.max(maximum, yvalue);
-                        }
-                        if (!Double.isNaN(lvalue)) {
-                            minimum = Math.min(minimum, lvalue);
-                        }
-                        if (!Double.isNaN(uvalue)) {
-                            maximum = Math.max(maximum, uvalue);
-                        }
-                    }
-                }
-            }
+        	return iterateIntervalXYDataset(dataset, visibleSeriesKeys, xRange, minimum, maximum);
         } else {
             // standard case - plain XYDataset
-            for (S seriesKey : visibleSeriesKeys) {
-                int series = dataset.indexOf(seriesKey);
-                int itemCount = dataset.getItemCount(series);
-                for (int item = 0; item < itemCount; item++) {
-                    double x = dataset.getXValue(series, item);
-                    double y = dataset.getYValue(series, item);
-                    if (xRange.contains(x)) {
-                        if (!Double.isNaN(y)) {
-                            minimum = Math.min(minimum, y);
-                            maximum = Math.max(maximum, y);
-                        }
+        	return iterateXYDataset(dataset, visibleSeriesKeys, xRange, minimum, maximum);
+        }
+    }
+   
+    /**
+     * Returns the range of y-values in the OHLC Dataset
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param xRange  the x-range ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The y-range (possibly {@code null}).
+     * 
+     * @param <S>  the type for the series keys.
+     */
+    private static <S extends Comparable<S>>  
+    	Range iterateOHLCDataset(XYDataset<S> dataset, List<S> visibleSeriesKeys, 
+    			Range xRange, double minimum, double maximum) {
+    
+	    OHLCDataset ohlc = (OHLCDataset) dataset;
+	    for (S seriesKey : visibleSeriesKeys) {
+	        int series = dataset.indexOf(seriesKey);
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double x = ohlc.getXValue(series, item);
+	            if (xRange.contains(x)) {
+	                double lvalue = ohlc.getLowValue(series, item);
+	                double uvalue = ohlc.getHighValue(series, item);
+	                if (!Double.isNaN(lvalue)) {
+	                    minimum = Math.min(minimum, lvalue);
+	                }
+	                if (!Double.isNaN(uvalue)) {
+	                    maximum = Math.max(maximum, uvalue);
+	                }
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
+    
+    
+    /**
+     * Returns the range of y-values in the Box And Whisker XYDataset
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param xRange  the x-range ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The y-range (possibly {@code null}).
+     * 
+     * @param <S>  the type for the series keys.
+     */
+    private static <S extends Comparable<S>>  
+    	Range iterateBoxAndWhiskerXYDataset(XYDataset<S> dataset, List<S> visibleSeriesKeys, 
+    			Range xRange, double minimum, double maximum) {
+    	
+        @SuppressWarnings("unchecked")
+        BoxAndWhiskerXYDataset<S> bx = (BoxAndWhiskerXYDataset) dataset;
+        for (S seriesKey : visibleSeriesKeys) {
+            int series = dataset.indexOf(seriesKey);
+            int itemCount = dataset.getItemCount(series);
+            for (int item = 0; item < itemCount; item++) {
+                double x = bx.getXValue(series, item);
+                if (xRange.contains(x)) {
+                    Number lvalue = bx.getMinRegularValue(series, item);
+                    Number uvalue = bx.getMaxRegularValue(series, item);
+                    if (lvalue != null) {
+                        minimum = Math.min(minimum, lvalue.doubleValue());
+                    }
+                    if (uvalue != null) {
+                        maximum = Math.max(maximum, uvalue.doubleValue());
                     }
                 }
             }
         }
-        if (minimum == Double.POSITIVE_INFINITY) {
-            return null;
-        } else {
-            return new Range(minimum, maximum);
-        }
+	    return createRangeBounds(minimum, maximum);
     }
+    
+    /**
+     * Returns the range of y-values in the Interval XYDataset
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param xRange  the x-range ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The y-range (possibly {@code null}).
+     * 
+     * @param <S>  the type for the series keys.
+     */
+    private static <S extends Comparable<S>>  
+    	Range iterateIntervalXYDataset(XYDataset<S> dataset, List<S> visibleSeriesKeys, 
+    			Range xRange, double minimum, double maximum) {
+    	
+        @SuppressWarnings("unchecked")
+        IntervalXYDataset<S> ixyd = (IntervalXYDataset) dataset;
+        for (S seriesKey : visibleSeriesKeys) {
+            int series = dataset.indexOf(seriesKey);
+            int itemCount = dataset.getItemCount(series);
+            for (int item = 0; item < itemCount; item++) {
+                double x = ixyd.getXValue(series, item);
+                if (xRange.contains(x)) {
+                    double yvalue = ixyd.getYValue(series, item);
+                    double lvalue = ixyd.getStartYValue(series, item);
+                    double uvalue = ixyd.getEndYValue(series, item);
+                    if (!Double.isNaN(yvalue)) {
+                        minimum = Math.min(minimum, yvalue);
+                        maximum = Math.max(maximum, yvalue);
+                    }
+                    if (!Double.isNaN(lvalue)) {
+                        minimum = Math.min(minimum, lvalue);
+                    }
+                    if (!Double.isNaN(uvalue)) {
+                        maximum = Math.max(maximum, uvalue);
+                    }
+                }
+            }
+        }
+	    return createRangeBounds(minimum, maximum);
+    }
+    /**
+     * Returns the range of y-values in th XYDataset
+     *
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param visibleSeriesKeys  the visible series keys.
+     * @param xRange  the x-range ({@code null} not permitted).
+     * @param minimum  the minimum value.
+     * @param maximum  the maximum value.
+     * @return The y-range (possibly {@code null}).
+     * 
+     * @param <S>  the type for the series keys.
+     */
+    private static <S extends Comparable<S>>  
+    	Range iterateXYDataset(XYDataset<S> dataset, List<S> visibleSeriesKeys, 
+    			Range xRange, double minimum, double maximum) {
+    	
+	    for (S seriesKey : visibleSeriesKeys) {
+	        int series = dataset.indexOf(seriesKey);
+	        int itemCount = dataset.getItemCount(series);
+	        for (int item = 0; item < itemCount; item++) {
+	            double x = dataset.getXValue(series, item);
+	            double y = dataset.getYValue(series, item);
+	            if (xRange.contains(x)) {
+	                if (!Double.isNaN(y)) {
+	                    minimum = Math.min(minimum, y);
+	                    maximum = Math.max(maximum, y);
+	                }
+	            }
+	        }
+	    }
+	    return createRangeBounds(minimum, maximum);
+    }
+
 
     /**
      * Returns the range of z-values in the specified dataset for the
@@ -2360,84 +2721,136 @@ public final class DatasetUtils {
             }
         }
         if (dataset.getDomainOrder() == DomainOrder.ASCENDING) {
-            int low = 0;
-            int high = itemCount - 1;
-            double lowValue = dataset.getXValue(series, low);
-            if (lowValue > x) {
-                return new int[] {-1, -1};
-            }
-            if (lowValue == x) {
-                return new int[] {low, low};
-            }
-            double highValue = dataset.getXValue(series, high);
-            if (highValue < x) {
-                return new int[] {-1, -1};
-            }
-            if (highValue == x) {
-                return new int[] {high, high};
-            }
-            int mid = (low + high) / 2;
-            while (high - low > 1) {
-                double midV = dataset.getXValue(series, mid);
-                if (x == midV) {
-                    return new int[] {mid, mid};
-                }
-                if (midV < x) {
-                    low = mid;
-                }
-                else {
-                    high = mid;
-                }
-                mid = (low + high) / 2;
-            }
-            return new int[] {low, high};
+        	return geIndexesAscendingOrder(dataset, series, itemCount, x);
         }
         else if (dataset.getDomainOrder() == DomainOrder.DESCENDING) {
-            int high = 0;
-            int low = itemCount - 1;
-            double lowValue = dataset.getXValue(series, low);
-            if (lowValue > x) {
-                return new int[] {-1, -1};
-            }
-            double highValue = dataset.getXValue(series, high);
-            if (highValue < x) {
-                return new int[] {-1, -1};
-            }
-            int mid = (low + high) / 2;
-            while (high - low > 1) {
-                double midV = dataset.getXValue(series, mid);
-                if (x == midV) {
-                    return new int[] {mid, mid};
-                }
-                if (midV < x) {
-                    low = mid;
-                }
-                else {
-                    high = mid;
-                }
-                mid = (low + high) / 2;
-            }
-            return new int[] {low, high};
+        	return geIndexesDescendingOrder(dataset, series, itemCount, x);
+            
         }
         else {
             // we don't know anything about the ordering of the x-values,
             // so we iterate until we find the first crossing of x (if any)
             // we know there are at least 2 items in the series at this point
-            double prev = dataset.getXValue(series, 0);
-            if (x == prev) {
-                return new int[] {0, 0}; // exact match on first item
-            }
-            for (int i = 1; i < itemCount; i++) {
-                double next = dataset.getXValue(series, i);
-                if (x == next) {
-                    return new int[] {i, i}; // exact match
-                }
-                if ((x > prev && x < next) || (x < prev && x > next)) {
-                    return new int[] {i - 1, i}; // spanning match
-                }
-            }
-            return new int[] {-1, -1}; // no crossing of x
+        	return geIndexesUnknownOrder(dataset, series, itemCount, x);
         }
     }
-
+    
+    /**
+     * Gets the indices of the the items in the dataset that span the 
+     * specified x-value, sorted in ascending order.
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param series  the series index.
+     * @param itemCount the number of items in the series.
+     * @param x  the x-value.
+     *
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The indices of the two items that span the x-value.
+     */
+    private static <S extends Comparable<S>> int[] geIndexesAscendingOrder(XYDataset<S> dataset, 
+    		int series, int itemCount, double x) {
+        int low = 0;
+        int high = itemCount - 1;
+        double lowValue = dataset.getXValue(series, low);
+        if (lowValue > x) {
+            return new int[] {-1, -1};
+        }
+        if (lowValue == x) {
+            return new int[] {low, low};
+        }
+        double highValue = dataset.getXValue(series, high);
+        if (highValue < x) {
+            return new int[] {-1, -1};
+        }
+        if (highValue == x) {
+            return new int[] {high, high};
+        }
+        int mid = (low + high) / 2;
+        while (high - low > 1) {
+            double midV = dataset.getXValue(series, mid);
+            if (x == midV) {
+                return new int[] {mid, mid};
+            }
+            if (midV < x) {
+                low = mid;
+            }
+            else {
+                high = mid;
+            }
+            mid = (low + high) / 2;
+        }
+        return new int[] {low, high};
+    }
+    
+    /**
+     * Gets the indices of the the items in the dataset that span the 
+     * specified x-value, sorted in descending order.
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param series  the series index.
+     * @param itemCount the number of items in the series.
+     * @param x  the x-value.
+     *
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The indices of the two items that span the x-value.
+     */
+    private static <S extends Comparable<S>> int[] geIndexesDescendingOrder(XYDataset<S> dataset, 
+    		int series, int itemCount, double x) {
+    	int high = 0;
+        int low = itemCount - 1;
+        double lowValue = dataset.getXValue(series, low);
+        if (lowValue > x) {
+            return new int[] {-1, -1};
+        }
+        double highValue = dataset.getXValue(series, high);
+        if (highValue < x) {
+            return new int[] {-1, -1};
+        }
+        int mid = (low + high) / 2;
+        while (high - low > 1) {
+            double midV = dataset.getXValue(series, mid);
+            if (x == midV) {
+                return new int[] {mid, mid};
+            }
+            if (midV < x) {
+                low = mid;
+            }
+            else {
+                high = mid;
+            }
+            mid = (low + high) / 2;
+        }
+        return new int[] {low, high};
+    }
+    
+    /**
+     * Gets the indices of the the items in the dataset that span the 
+     * specified x-value. Iterates until it finds the first crossing of x .
+     * 
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param series  the series index.
+     * @param itemCount the number of items in the series.
+     * @param x  the x-value.
+     *
+     * @param <S>  the type for the series keys.
+     * 
+     * @return The indices of the two items that span the x-value.
+     */
+    private static <S extends Comparable<S>> int[] geIndexesUnknownOrder(XYDataset<S> dataset, 
+    		int series, int itemCount, double x) {
+	    double prev = dataset.getXValue(series, 0);
+	    if (x == prev) {
+	        return new int[] {0, 0}; // exact match on first item
+	    }
+	    for (int i = 1; i < itemCount; i++) {
+	        double next = dataset.getXValue(series, i);
+	        if (x == next) {
+	            return new int[] {i, i}; // exact match
+	        }
+	        if ((x > prev && x < next) || (x < prev && x > next)) {
+	            return new int[] {i - 1, i}; // spanning match
+	        }
+	    }
+	    return new int[] {-1, -1}; // no crossing of x
+    }
 }
