@@ -36,14 +36,19 @@
 
 package org.jfree.data.json.impl;
 
+import java.io.BufferedWriter;
+
 import java.io.FileReader;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.util.List;
 
 import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.io.CSV;
+import org.jfree.data.io.CSVProduct;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,9 +57,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.jfree.data.json.impl.*;
 
 /**
- * Tests for the {@link JSONArray} class.
+ * Tests for the {@link JSONValue} class.
  */
-public class JSONArrayTest {
+public class JSONValueTest {
 
 
     /**
@@ -67,15 +72,47 @@ public class JSONArrayTest {
     }
 
     /**
-     * Some tests for the writeJSONString() method.
+     * Some tests for the toJSONString() method.
      * @throws IOException 
      */
     @Test
-    public void testWriteJSONString() throws IOException {
-    	List test = null;
+    public void testtoJSONString() throws IOException {
+    	Double doub = 1.0;
+    	Double doub_1 = Double.NaN;
+    	
+    	float ft = 1;
+    	float ft_1 = Float.NaN;
+    	
+    	Number num = 1;
+    	Number num_1 = null;
+    	
+    	boolean bol = true;
+    	boolean bol_1 = false;
+    	
+    	String st = "test";
+    	
+    	assertEquals(JSONValue.toJSONString(st), "\"test\"");
+    	assertEquals(JSONValue.toJSONString(null), "null");
+    	assertEquals(JSONValue.toJSONString(doub_1), "null");
+    	assertEquals(JSONValue.toJSONString(doub), doub.toString());
+    	
+    	assertEquals(JSONValue.toJSONString(ft), String.valueOf(ft));
+    	assertEquals(JSONValue.toJSONString(ft_1), "null");
+    	assertEquals(JSONValue.toJSONString(num), String.valueOf(num));
+    	assertEquals(JSONValue.toJSONString(num_1), String.valueOf(num_1));
+    	assertEquals(JSONValue.toJSONString(bol), String.valueOf(bol));
+    	assertEquals(JSONValue.toJSONString(bol_1), String.valueOf(bol_1));
 
-    	Writer createdWriterWithSuccess = Writer.nullWriter();
-    	JSONArray.writeJSONString(test,createdWriterWithSuccess);
-    	assertTrue(createdWriterWithSuccess instanceof Writer);
+    
     }
+    
+    /**
+     * Some tests for the escape() method.
+     */
+    @Test
+    public void testEscape() {
+    	String s= null;
+    	assertEquals(JSONValue.escape(s), null);
+    }
+    
 }
