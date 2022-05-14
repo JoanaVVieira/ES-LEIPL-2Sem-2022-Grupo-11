@@ -87,24 +87,8 @@ public class DefaultHeatMapDataset extends AbstractDataset
     public DefaultHeatMapDataset(int xSamples, int ySamples, double minX,
             double maxX, double minY, double maxY) {
 
-        if (xSamples < 1) {
-            throw new IllegalArgumentException("Requires 'xSamples' > 0");
-        }
-        if (ySamples < 1) {
-            throw new IllegalArgumentException("Requires 'ySamples' > 0");
-        }
-        if (Double.isInfinite(minX) || Double.isNaN(minX)) {
-            throw new IllegalArgumentException("'minX' cannot be INF or NaN.");
-        }
-        if (Double.isInfinite(maxX) || Double.isNaN(maxX)) {
-            throw new IllegalArgumentException("'maxX' cannot be INF or NaN.");
-        }
-        if (Double.isInfinite(minY) || Double.isNaN(minY)) {
-            throw new IllegalArgumentException("'minY' cannot be INF or NaN.");
-        }
-        if (Double.isInfinite(maxY) || Double.isNaN(maxY)) {
-            throw new IllegalArgumentException("'maxY' cannot be INF or NaN.");
-        }
+    	validateSamplesParameters(xSamples, ySamples);
+    	validateMinimumAndMaximumParameters(minX, maxX, minY, maxY);
 
         this.xSamples = xSamples;
         this.ySamples = ySamples;
@@ -116,6 +100,45 @@ public class DefaultHeatMapDataset extends AbstractDataset
         for (int x = 0; x < xSamples; x++) {
             this.zValues[x] = new double[ySamples];
         }
+    }
+    
+    /**
+     * Validates the number of x-value and y-value.
+     *
+     * @param xSamples  the number of x-values.
+     * @param ySamples  the number of y-values
+     */
+    private void validateSamplesParameters(int xSamples, int ySamples) {
+	    if (xSamples < 1) {
+	        throw new IllegalArgumentException("Requires 'xSamples' > 0");
+	    }
+	    if (ySamples < 1) {
+	        throw new IllegalArgumentException("Requires 'ySamples' > 0");
+	    }
+    }
+    
+    /**
+     * Validates the minimum and maximum of x-value and y-value.
+     *
+     * @param minX  the minimum x-value in the dataset.
+     * @param maxX  the maximum x-value in the dataset.
+     * @param minY  the minimum y-value in the dataset.
+     * @param maxY  the maximum y-value in the dataset.
+     */
+    private void validateMinimumAndMaximumParameters(double minX,
+            double maxX, double minY, double maxY) {
+	    if (Double.isInfinite(minX) || Double.isNaN(minX)) {
+	        throw new IllegalArgumentException("'minX' cannot be INF or NaN.");
+	    }
+	    if (Double.isInfinite(maxX) || Double.isNaN(maxX)) {
+	        throw new IllegalArgumentException("'maxX' cannot be INF or NaN.");
+	    }
+	    if (Double.isInfinite(minY) || Double.isNaN(minY)) {
+	        throw new IllegalArgumentException("'minY' cannot be INF or NaN.");
+	    }
+	    if (Double.isInfinite(maxY) || Double.isNaN(maxY)) {
+	        throw new IllegalArgumentException("'maxY' cannot be INF or NaN.");
+	    }
     }
 
     /**

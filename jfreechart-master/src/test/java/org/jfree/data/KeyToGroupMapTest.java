@@ -197,6 +197,22 @@ public class KeyToGroupMapTest {
         }
         assertTrue(pass);
     }
+    
+    /**
+     * Tests the getGroups() method.
+     */
+    @Test
+    public void testGetGroups() {
+    	KeyToGroupMap<String, String> m1 = new KeyToGroupMap<>();
+    	KeyToGroupMap<String, String> m2 = new KeyToGroupMap<>();
+    	assertEquals(m1.getGroups(), m2.getGroups());
+    	
+    	m1.mapKeyToGroup("A1", "A1.1");
+    	assertNotEquals(m1.getGroups(), m2.getGroups());
+    	
+    	m2.mapKeyToGroup("A1", "A1.1");
+    	assertEquals(m1.getGroups(), m2.getGroups());
+    }
 
     /**
      * Confirm that the equals method can distinguish all the required fields.

@@ -77,8 +77,11 @@ public class DefaultKeyedValueTest {
     public void testEquals() {
         DefaultKeyedValue<String> v1 = new DefaultKeyedValue<>("Test", 45.5);
         DefaultKeyedValue<String> v2 = new DefaultKeyedValue<>("Test", 45.5);
+        DefaultKeyedValue<String> v3 = new DefaultKeyedValue<>("Test", 40.5);
         assertEquals(v1, v2);
         assertEquals(v2, v1);
+        assertEquals(true,v1.equals(v1));
+        assertEquals(false,v1.equals(v3));
 
         v1 = new DefaultKeyedValue<>("Test 1", 45.5);
         v2 = new DefaultKeyedValue<>("Test 2", 45.5);
@@ -129,4 +132,12 @@ public class DefaultKeyedValueTest {
         assertEquals(v1, v2);
     }
 
+    /**
+     * Test toString.
+     */
+    @Test
+    public void testToString() {
+        DefaultKeyedValue<String> v1 = new DefaultKeyedValue<>("Test", 25.3);
+        assertEquals(v1.toString(), "(" + v1.getKey().toString() + ", " + v1.getValue().toString() + ")");
+    }
 }

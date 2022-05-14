@@ -143,32 +143,52 @@ public class DefaultBoxAndWhiskerCategoryDataset<R extends Comparable<R>,
             if (item.getMaxOutlier() != null) {
                 maxval = item.getMaxOutlier().doubleValue();
             }
-
-            if (Double.isNaN(this.maximumRangeValue)) {
-                this.maximumRangeValue = maxval;
-                this.maximumRangeValueRow = r;
-                this.maximumRangeValueColumn = c;
-            }
-            else if (maxval > this.maximumRangeValue) {
-                this.maximumRangeValue = maxval;
-                this.maximumRangeValueRow = r;
-                this.maximumRangeValueColumn = c;
-            }
-
-            if (Double.isNaN(this.minimumRangeValue)) {
-                this.minimumRangeValue = minval;
-                this.minimumRangeValueRow = r;
-                this.minimumRangeValueColumn = c;
-            }
-            else if (minval < this.minimumRangeValue) {
-                this.minimumRangeValue = minval;
-                this.minimumRangeValueRow = r;
-                this.minimumRangeValueColumn = c;
-            }
+            setMaximumRangeValues(maxval, r, c);
+            setMinimumRangeValues(minval, r, c);
         }
 
         fireDatasetChanged();
 
+    }
+    
+    /**
+     * Sets the maximum range value
+     *
+     * @param maxval  the maximum outlier.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     */
+    public void setMaximumRangeValues(double maxval, int rowKey, int columnKey) {
+	    if (Double.isNaN(this.maximumRangeValue)) {
+	        this.maximumRangeValue = maxval;
+	        this.maximumRangeValueRow = rowKey;
+	        this.maximumRangeValueColumn = columnKey;
+	    }
+	    else if (maxval > this.maximumRangeValue) {
+	        this.maximumRangeValue = maxval;
+	        this.maximumRangeValueRow = rowKey;
+	        this.maximumRangeValueColumn = columnKey;
+	    }
+    }
+    
+  /**
+   * Sets the minimum range value 
+   *
+   * @param minval  the minimum outlier.
+   * @param rowKey  the row key.
+   * @param columnKey  the column key.
+   */
+    public void setMinimumRangeValues(double minval, int rowKey, int columnKey) {
+		if (Double.isNaN(this.minimumRangeValue)) {
+		    this.minimumRangeValue = minval;
+		    this.minimumRangeValueRow = rowKey;
+		    this.minimumRangeValueColumn = columnKey;
+		}
+		else if (minval < this.minimumRangeValue) {
+		    this.minimumRangeValue = minval;
+		    this.minimumRangeValueRow = rowKey;
+		    this.minimumRangeValueColumn = columnKey;
+		}
     }
 
     /**
@@ -864,29 +884,51 @@ public class DefaultBoxAndWhiskerCategoryDataset<R extends Comparable<R>,
                 if (item != null) {
                     Number min = item.getMinOutlier();
                     if (min != null) {
-                        double minv = min.doubleValue();
-                        if (!Double.isNaN(minv)) {
-                            if (minv < this.minimumRangeValue || Double.isNaN(
-                                    this.minimumRangeValue)) {
-                                this.minimumRangeValue = minv;
-                                this.minimumRangeValueRow = r;
-                                this.minimumRangeValueColumn = c;
-                            }
-                        }
+                    	updateMinimumRangeValues(min, r, c); 
                     }
                     Number max = item.getMaxOutlier();
                     if (max != null) {
-                        double maxv = max.doubleValue();
-                        if (!Double.isNaN(maxv)) {
-                            if (maxv > this.maximumRangeValue || Double.isNaN(
-                                    this.maximumRangeValue)) {
-                                this.maximumRangeValue = maxv;
-                                this.maximumRangeValueRow = r;
-                                this.maximumRangeValueColumn = c;
-                            }
-                        }
+                    	updateMaximumRangeValues(max, r, c);
                     }
                 }
+            }
+        }
+    }
+    
+    /**
+     * Update the maximum range value
+     *
+     * @param max  the maximum outlier.
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
+     */
+    public void updateMaximumRangeValues(Number max, int rowKey, int columnKey) {
+    	double maxv = max.doubleValue();
+        if (!Double.isNaN(maxv)) {
+            if (maxv > this.maximumRangeValue || Double.isNaN(
+                    this.maximumRangeValue)) {
+                this.maximumRangeValue = maxv;
+                this.maximumRangeValueRow = rowKey;
+                this.maximumRangeValueColumn = columnKey;
+            }
+        }
+    }
+    
+  /**
+   * Update the minimum range value 
+   *
+   * @param min  the minimum outlier.
+   * @param rowKey  the row key.
+   * @param columnKey  the column key.
+   */
+    public void updateMinimumRangeValues(Number min, int rowKey, int columnKey) {
+    	double minv = min.doubleValue();
+        if (!Double.isNaN(minv)) {
+            if (minv < this.minimumRangeValue || Double.isNaN(
+                    this.minimumRangeValue)) {
+                this.minimumRangeValue = minv;
+                this.minimumRangeValueRow = rowKey;
+                this.minimumRangeValueColumn = columnKey;
             }
         }
     }

@@ -164,7 +164,21 @@ public class TimePeriodValues<S extends Comparable<S>> extends Series<S>
         long end = period.getEnd().getTime();
         long middle = start + ((end - start) / 2);
 
-        if (this.minStartIndex >= 0) {
+
+        updateStartIndex(start, index);
+        updateMiddleIndex(middle, index);
+        updateEndIndex(end, index);   
+    }
+    
+    /**
+	 * Update start index values for the maximum and minimum bounds.
+	 * 
+	 * @param start  the start date/time.
+	 * @param index  the index of the time period.
+	 */
+	private void updateStartIndex(long start, int index) {
+        
+		if (this.minStartIndex >= 0) {
             long minStart = getDataItem(this.minStartIndex).getPeriod()
                 .getStart().getTime();
             if (start < minStart) {
@@ -185,8 +199,17 @@ public class TimePeriodValues<S extends Comparable<S>> extends Series<S>
         else {
             this.maxStartIndex = index;
         }
-        
-        if (this.minMiddleIndex >= 0) {
+	}
+
+    /**
+     * Update middle index values for the maximum and minimum bounds.
+     * 
+     * @param middle the middle date/time.
+     * @param index  the index of the time period.
+     */
+    private void updateMiddleIndex(long middle, int index) {
+    	
+    	if (this.minMiddleIndex >= 0) {
             long s = getDataItem(this.minMiddleIndex).getPeriod().getStart()
                 .getTime();
             long e = getDataItem(this.minMiddleIndex).getPeriod().getEnd()
@@ -213,6 +236,16 @@ public class TimePeriodValues<S extends Comparable<S>> extends Series<S>
         else {
             this.maxMiddleIndex = index;
         }
+    }
+    
+    
+    /**
+     * Update end index values for the maximum and minimum bounds.
+     * 
+     * @param end  the end date/time .
+     * @param index  the index of the time period.
+     */
+    private void updateEndIndex(long end, int index) {
         
         if (this.minEndIndex >= 0) {
             long minEnd = getDataItem(this.minEndIndex).getPeriod().getEnd()
@@ -235,7 +268,6 @@ public class TimePeriodValues<S extends Comparable<S>> extends Series<S>
         else {
             this.maxEndIndex = index;
         }
-        
     }
     
     /**
