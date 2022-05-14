@@ -221,6 +221,17 @@ public class OHLCSeriesCollectionTest implements DatasetChangeListener {
         assertNotNull(this.lastEvent);
         this.lastEvent = null;  // clean up
     }
+    
+    /**
+     * Tests TimePeriodAnchor() method.
+     */
+    @Test
+    public void testTimePeriodAnchor() {
+    	OHLCSeriesCollection c1 = new OHLCSeriesCollection();
+    	c1.setXPosition(TimePeriodAnchor.END);
+        assertEquals(c1.getXPosition(), TimePeriodAnchor.END);
+    	
+    }
 
     /** The last received event. */
     private DatasetChangeEvent lastEvent;
