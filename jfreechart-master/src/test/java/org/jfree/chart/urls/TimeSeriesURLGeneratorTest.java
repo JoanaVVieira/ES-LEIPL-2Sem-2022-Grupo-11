@@ -36,6 +36,7 @@
 
 package org.jfree.chart.urls;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.jfree.chart.TestUtils;
@@ -129,4 +130,60 @@ public class TimeSeriesURLGeneratorTest {
         assertFalse(g1 instanceof PublicCloneable);
     }
 
+    
+    /**
+     * Test for get value o {@link DateFormat} dateformat
+     */
+    @Test
+    public void testGetDateFormat() {
+        TimeSeriesURLGenerator g1 = new TimeSeriesURLGenerator();
+        g1 = new TimeSeriesURLGenerator(new SimpleDateFormat("yyyy"), "prefix",
+                "series", "item");
+        DateFormat d1 = new SimpleDateFormat("yyyy");
+        assertEquals(g1.getDateFormat(),d1);
+    }
+    
+    
+    
+    /**
+     * Test for get value o {@link String} prefix
+     */
+    @Test
+    public void testGetPrefix() {
+        TimeSeriesURLGenerator g1 = new TimeSeriesURLGenerator();
+        g1 = new TimeSeriesURLGenerator(new SimpleDateFormat("yyyy"), "prefix",
+                "series", "item");
+        String p1 = "prefix";
+        assertTrue(g1.getPrefix().equals(p1));
+    }
+    
+    
+    /**
+     * Test for get value o {@link String} series parameter name
+     */
+    @Test
+    public void testGetSeriesParameterName() {
+        TimeSeriesURLGenerator g1 = new TimeSeriesURLGenerator();
+        g1 = new TimeSeriesURLGenerator(new SimpleDateFormat("yyyy"), "prefix",
+                "series", "item");
+        String s1 = "series";
+        String s2 = g1.getSeriesParameterName();	
+        assertTrue(s2.equals(s2));
+    }
+    
+    
+    
+    /**
+     * Test for get value o {@link String} item parameter name
+     */
+    @Test
+    public void testGetItemParameterName() {
+        TimeSeriesURLGenerator g1 = new TimeSeriesURLGenerator();
+        g1 = new TimeSeriesURLGenerator(new SimpleDateFormat("yyyy"), "prefix",
+                "series", "item");
+        String i1 = "item";
+        String i2 = g1.getItemParameterName();
+        assertTrue(i2.equals(i1));
+    }
+    
 }
