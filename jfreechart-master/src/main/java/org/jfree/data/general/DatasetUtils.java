@@ -1653,7 +1653,7 @@ public final class DatasetUtils {
      * @return The x-range (possibly {@code null}).
      * 
      */
-    public static <S extends Comparable<S>> Range iterateIntervalXYDataset(
+    private static <S extends Comparable<S>> Range iterateIntervalXYDataset(
             XYDataset<S> dataset, List<S> visibleSeriesKeys, double minimum, double maximum) {
 	    @SuppressWarnings("unchecked")
 	    IntervalXYDataset<S> ixyd = (IntervalXYDataset) dataset;
@@ -1694,7 +1694,7 @@ public final class DatasetUtils {
      * @return The x-range (possibly {@code null}).
      * 
      */
-    public static <S extends Comparable<S>> Range iterateXYDataset(
+    private static <S extends Comparable<S>> Range iterateXYDataset(
             XYDataset<S> dataset, List<S> visibleSeriesKeys, double minimum, double maximum) {
 	    for (S seriesKey : visibleSeriesKeys) {
 	        int series = dataset.indexOf(seriesKey);
