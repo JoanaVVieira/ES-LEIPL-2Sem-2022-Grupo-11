@@ -81,6 +81,8 @@ public class DefaultFlowDatasetTest {
     public void testEquals() {
         DefaultFlowDataset<String> d1 = new DefaultFlowDataset<>();
         DefaultFlowDataset<String> d2 = new DefaultFlowDataset<>();
+        assertEquals(true,d1.equals(d1));
+        assertEquals(false,d1.equals("2"));
         assertEquals(d1, d2);
         
         d1.setFlow(0, "A", "Z", 1.0);
