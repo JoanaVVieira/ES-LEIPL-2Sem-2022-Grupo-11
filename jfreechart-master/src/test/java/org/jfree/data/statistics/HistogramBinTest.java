@@ -47,7 +47,23 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class HistogramBinTest {
 
-    /**
+	/**
+     * Tests the constructor
+     */
+    @Test
+    public void testConstructor() {
+    	boolean pass = false;
+    	try {
+    		new HistogramBin(20, 10);
+        }
+        catch (IllegalArgumentException e) {
+            pass = true;
+        }
+        assertTrue(pass);
+        
+    }
+	
+	/**
      * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
@@ -55,8 +71,18 @@ public class HistogramBinTest {
         double start = 10.0;
         double end = 20.0;
         HistogramBin b1 = new HistogramBin(start, end);
+        assertEquals(b1, b1);
+        
         HistogramBin b2 = new HistogramBin(start, end);
         assertEquals(b1, b2);
+        
+        assertNotEquals(b1, null);
+        
+        HistogramBin b3 = new HistogramBin(start, 30.0);
+        assertNotEquals(b1, b3);
+        
+        String s = "";
+        assertNotEquals(b1, s);
     }
 
     /**
@@ -83,6 +109,21 @@ public class HistogramBinTest {
         HistogramBin b1 = new HistogramBin(start, end);
         HistogramBin b2 = TestUtils.serialised(b1);
         assertEquals(b1, b2);
+    }
+    
+    /**
+     * Some checks to hashCode() method.
+     */
+    @Test
+    public void testHashCode() {
+    	double start = 10.0;
+        double end = 20.0;
+        HistogramBin b1 = new HistogramBin(start, end);
+    	HistogramBin b2 = new HistogramBin(start, end);
+        assertEquals(b1.hashCode(), b2.hashCode());
+        
+        HistogramBin b3 = new HistogramBin(start, 30.0);
+        assertNotEquals(b1, b3);
     }
 
 }

@@ -53,8 +53,14 @@ public class SimpleHistogramDatasetTest {
     @Test
     public void testEquals() {
         SimpleHistogramDataset<String> d1 = new SimpleHistogramDataset<>("Dataset 1");
+        assertEquals(d1, d1);
+        
         SimpleHistogramDataset<String> d2 = new SimpleHistogramDataset<>("Dataset 1");
         assertEquals(d1, d2);
+        assertEquals(d2, d1);
+        
+        String s = "";
+        assertNotEquals(d1, s);
 
         d1.addBin(new SimpleHistogramBin(1.0, 2.0));
         assertNotEquals(d1, d2);
@@ -87,6 +93,16 @@ public class SimpleHistogramDatasetTest {
         SimpleHistogramDataset<String> d1 = new SimpleHistogramDataset<>("D1");
         SimpleHistogramDataset<String> d2 = TestUtils.serialised(d1);
         assertEquals(d1, d2);
+    }
+    
+    /**
+     * Some checks to hashCode() method.
+     */
+    @Test
+    public void testHashCode() {
+        SimpleHistogramDataset<String> d1 = new SimpleHistogramDataset<>("D1");
+        SimpleHistogramDataset<String> d2 = new SimpleHistogramDataset<>("D1");
+        assertEquals(d1.hashCode(), d2.hashCode());
     }
 
     private static final double EPSILON = 0.0000000001;
