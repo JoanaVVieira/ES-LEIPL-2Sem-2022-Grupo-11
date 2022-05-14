@@ -91,6 +91,15 @@ public class NodeKeyTest {
         NodeKey<String> k2 = TestUtils.serialised(k1);
         assertEquals(k1, k2);
     }
+    
+    /**
+     * Testing method toString.
+     */
+    @Test
+    public void testToString() {
+        NodeKey<String> k1 = new NodeKey<>(1, "S1");
+        assertEquals(k1.toString(), "[NodeKey: "+k1.getStage()+ ", " +k1.getNode()+ "]");
+    }
 
 }
 
