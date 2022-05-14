@@ -83,6 +83,8 @@ public class DefaultHeatMapDatasetTest implements DatasetChangeListener {
         d.setZValue(1, 2, 2.0);
         assertEquals(2.0, d.getZValue(1, 2), EPSILON);
         assertNotNull(this.lastEvent);
+        assertEquals(0, d.getXValue(0), EPSILON);
+        assertEquals(0, d.getYValue(0), EPSILON);
     }
 
     /**

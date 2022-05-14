@@ -173,4 +173,36 @@ public class DefaultPieDatasetTest implements DatasetChangeListener {
         assertEquals(1.0, d.getValue(0));
         assertThrows(IndexOutOfBoundsException.class, () ->  d.getValue(1));        
     }
+    
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
+    @Test
+    public void testinsertValue() {
+        DefaultPieDataset<String> d1 = new DefaultPieDataset<>();
+        d1.setValue("C1", 234.2);
+        d1.setValue("C2", null);
+        d1.insertValue(0, "C1", 0);
+        assertEquals(d1.getIndex("C1"), 0);
+    }
+    
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
+    @Test
+    public void testremove() {
+        DefaultPieDataset<String> d1 = new DefaultPieDataset<>();
+        d1.setValue("C1", 234.2);
+        d1.setValue("C2", null);
+ 
+        DefaultPieDataset<String> d2 = new DefaultPieDataset<>();
+        d2.setValue("C1", 234.2);
+        d2.setValue("C2", null);
+        
+        d2.remove("C1");
+        
+        assertNotEquals(d1.getIndex("C1"), d2.getIndex("C1"));
+    }
+    
+    
 }
