@@ -37,6 +37,7 @@
 package org.jfree.data.statistics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
@@ -47,7 +48,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the {@link Regression} class.
  */
 public class RegressionTest {
-
+    
     /**
      * Checks the results of an OLS regression on sample dataset 1.
      */
