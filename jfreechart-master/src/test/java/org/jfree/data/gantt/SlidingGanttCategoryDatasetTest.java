@@ -172,4 +172,20 @@ public class SlidingGanttCategoryDatasetTest {
         }
         assertTrue(invalidColumnKey);
     }
+    
+    @Test
+    public void testGetColumnCount() {
+        TaskSeries<String> s1 = new TaskSeries<>("Series");
+        s1.add(new Task("Task 1", new Date(0L), new Date(1L)));
+        s1.add(new Task("Task 2", new Date(10L), new Date(11L)));
+        s1.add(new Task("Task 3", new Date(20L), new Date(21L)));
+        TaskSeriesCollection<String, String> u1 = new TaskSeriesCollection<>();
+        u1.add(s1);
+        SlidingGanttCategoryDataset d1 = new SlidingGanttCategoryDataset(
+                u1, 0, 5);
+        
+        assertEquals(3, d1.getColumnCount());
+
+    }
+
 }
