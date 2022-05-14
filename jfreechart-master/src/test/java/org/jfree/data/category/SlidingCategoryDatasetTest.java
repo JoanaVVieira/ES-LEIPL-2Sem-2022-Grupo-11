@@ -217,27 +217,68 @@ public class SlidingCategoryDatasetTest {
                 = new SlidingCategoryDataset<>(underlying, 1, 2);
         assertEquals(2.0, dataset.getValue("R1", "C2"));
         assertEquals(3.0, dataset.getValue("R1", "C3"));
+        
         boolean pass = false;
         try {
-            dataset.getValue("R1", "C1");
+        	dataset.getValue("R5", "C2");
         }
         catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
-
+        
         pass = false;
         try {
-            dataset.getValue("R1", "C4");
+        	dataset.getValue("R1", "C6");
         }
         catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
+        
+    }
+    
+    /**
+     * Some checks for the getValue(int,int) method.
+     */
+    @Test
+    public void testGetValueInt() {
+        DefaultCategoryDataset<String, String> underlying 
+                = new DefaultCategoryDataset<>();
+        underlying.addValue(1.0, "R1", "C1");
+        underlying.addValue(2.0, "R1", "C2");
+        underlying.addValue(3.0, "R1", "C3");
+        underlying.addValue(4.0, "R1", "C4");
+        SlidingCategoryDataset<String, String> dataset 
+                = new SlidingCategoryDataset<>(underlying, 1, 2);
+        assertEquals(2.0, dataset.getValue(0, 0));
+        assertEquals(3.0, dataset.getValue(0, 1));
     }
 
     /**
-     * Some checks for the getColumnKeys() method.
+     * Some checks for the getColumnKeys(int) method.
+     */
+    @Test
+    public void testGetColumnKeyInt() {
+        DefaultCategoryDataset<String, String> underlying 
+                = new DefaultCategoryDataset<>();
+        underlying.addValue(1.0, "R1", "C1");
+        underlying.addValue(2.0, "R1", "C2");
+        underlying.addValue(3.0, "R1", "C3");
+        underlying.addValue(4.0, "R1", "C4");
+        SlidingCategoryDataset<String, String> dataset 
+                = new SlidingCategoryDataset<>(underlying, 1, 2);
+        String keys = dataset.getColumnKey(0);
+        assertTrue(keys.contains("C2"));
+
+        dataset.setFirstCategoryIndex(3);
+        keys = dataset.getColumnKey(0);
+        assertTrue(keys.contains("C4"));
+        assertEquals(2, keys.length());
+    }
+    
+    /**
+     * Some checks for the getColumnKey() method.
      */
     @Test
     public void testGetColumnKeys() {
@@ -259,5 +300,4 @@ public class SlidingCategoryDatasetTest {
         assertTrue(keys.contains("C4"));
         assertEquals(1, keys.size());
     }
-
 }

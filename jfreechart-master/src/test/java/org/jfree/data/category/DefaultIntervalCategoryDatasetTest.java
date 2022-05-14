@@ -98,6 +98,20 @@ public class DefaultIntervalCategoryDatasetTest {
             pass = true;
         }
         assertTrue(pass);
+        
+        pass = false;
+        try {
+        	double[][] ends1 = new double[][] {ends_S1};
+        	DefaultIntervalCategoryDataset d1 = new DefaultIntervalCategoryDataset(
+                    new Comparable[] {"Series 1", "Series 2"},
+                    new Comparable[] {"Category 1", "Category 2", "Category 3"},
+                    DataUtils.createNumberArray2D(starts),
+                    DataUtils.createNumberArray2D(ends1));
+        }
+        catch (IllegalArgumentException e) {
+            pass = true;
+        }
+        assertTrue(pass);
     }
 
 
@@ -331,6 +345,25 @@ public class DefaultIntervalCategoryDatasetTest {
         assertEquals(-1, empty.getSeriesIndex("ABC"));
     }
 
+    /**
+     * Some checks for the getSeriesKey() method.
+     */
+    @Test
+    public void testGetSeriesKey() {
+        // check an empty dataset
+        DefaultIntervalCategoryDataset empty
+                = new DefaultIntervalCategoryDataset(new double[0][0],
+                        new double[0][0]);
+        boolean pass = false;
+        try {
+        	empty.getSeriesKey(3);
+        }
+        catch (IllegalArgumentException e) {
+            pass = true;
+        }
+        assertTrue(pass);
+    }
+    
     /**
      * Some checks for the getRowIndex() method.
      */

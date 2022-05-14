@@ -150,6 +150,20 @@ public class CategoryToPieDatasetTest {
             // this is expected
         }
     }
+    
+    /**
+     * Some checks for the getKeys() method.
+     */
+    @Test
+    public void testGetKeys() {
+        DefaultCategoryDataset<String, String> underlying = new DefaultCategoryDataset<>();
+        underlying.addValue(1.1, "R1", "C1");
+        underlying.addValue(2.2, "R1", "C2");
+        CategoryToPieDataset d1 = new CategoryToPieDataset(underlying,
+                TableOrder.BY_ROW, 0);
+        assertEquals(d1.getKeys().get(0), "C1");
+        assertEquals(d1.getKeys().get(1), "C2");
+    }
 
     /**
      * Some checks for the getIndex() method.

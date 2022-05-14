@@ -310,7 +310,8 @@ public abstract class Regression {
 
 	
     /**
-     * Returns the squared error of Y polynomial regression.
+     * Returns the squared error of Y polynomial regression
+     * .
      *
      * @param validItems  number of valid items.
      * @param data  the x and y values from the series.
