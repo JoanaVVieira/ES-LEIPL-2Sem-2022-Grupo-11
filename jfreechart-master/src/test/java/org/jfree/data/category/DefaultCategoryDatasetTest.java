@@ -379,4 +379,48 @@ public class DefaultCategoryDatasetTest {
         assertTrue(pass);
     }
 
+    /**
+     * Some checks for the removeRow(int) method.
+     */
+    @Test
+    public void testRemoveRowInt() {
+        DefaultCategoryDataset<String,String> d = new DefaultCategoryDataset<>();
+        d.addValue(1.0, "R1", "C1");
+        d.addValue(2.0, "R2", "C2");
+        assertEquals(2, d.getRowCount());
+        d.removeRow(1);
+        assertEquals(1, d.getRowCount());
+
+        boolean pass = false;
+        try {
+            d.removeRow("XXX");
+        }
+        catch (IllegalArgumentException e) {
+            pass = true;
+        }
+        assertTrue(pass);
+    }
+    
+    /**
+     * Some checks for the removeColumn(int) method.
+     */
+    @Test
+    public void testRemoveColumnInt() {
+        DefaultCategoryDataset<String,String> d = new DefaultCategoryDataset<>();
+        d.addValue(1.0, "R1", "C1");
+        d.addValue(2.0, "R2", "C2");
+        assertEquals(2, d.getColumnCount());
+        d.removeColumn(1);
+        assertEquals(1, d.getColumnCount());
+
+        boolean pass = false;
+        try {
+            d.removeColumn("XXX");
+        }
+        catch (IllegalArgumentException e) {
+            pass = true;
+        }
+        assertTrue(pass);
+    }
+
 }

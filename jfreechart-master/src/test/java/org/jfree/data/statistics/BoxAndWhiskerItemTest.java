@@ -38,6 +38,7 @@ package org.jfree.data.statistics;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 
@@ -61,6 +62,47 @@ public class BoxAndWhiskerItemTest {
                 5.0, 6.0, 7.0, 8.0, new ArrayList<>());
         assertEquals(i1, i2);
         assertEquals(i2, i1);
+        
+        String s = "";
+        assertNotEquals(i1, s);
+        
+        BoxAndWhiskerItem i3 = new BoxAndWhiskerItem(2.0, 2.0, 3.0, 4.0,
+                5.0, 6.0, 7.0, 8.0, new ArrayList<>());
+        assertNotEquals(i1, i3);
+        
+        BoxAndWhiskerItem i4 = new BoxAndWhiskerItem(1.0, 3.0, 3.0, 4.0,
+                5.0, 6.0, 7.0, 8.0, new ArrayList<>());
+        assertNotEquals(i1, i4);
+        
+        BoxAndWhiskerItem i5 = new BoxAndWhiskerItem(1.0, 2.0, 4.0, 4.0,
+                5.0, 6.0, 7.0, 8.0, new ArrayList<>());
+        assertNotEquals(i1, i5);
+        
+        BoxAndWhiskerItem i6 = new BoxAndWhiskerItem(1.0, 2.0, 3.0, 5.0,
+                5.0, 6.0, 7.0, 8.0, new ArrayList<>());
+        assertNotEquals(i1, i6);
+        
+        BoxAndWhiskerItem i7 = new BoxAndWhiskerItem(1.0, 2.0, 3.0, 4.0,
+                6.0, 6.0, 7.0, 8.0, new ArrayList<>());
+        assertNotEquals(i1, i7);
+        
+        BoxAndWhiskerItem i8 = new BoxAndWhiskerItem(1.0, 2.0, 3.0, 4.0,
+                5.0, 7.0, 7.0, 8.0, new ArrayList<>());
+        assertNotEquals(i1, i8);
+        
+        BoxAndWhiskerItem i9 = new BoxAndWhiskerItem(1.0, 2.0, 3.0, 4.0,
+                5.0, 6.0, 8.0, 8.0, new ArrayList<>());
+        assertNotEquals(i1, i9);
+        
+        BoxAndWhiskerItem i10 = new BoxAndWhiskerItem(1.0, 2.0, 3.0, 4.0,
+                5.0, 6.0, 7.0, 9.0, new ArrayList<>());
+        assertNotEquals(i1, i10);
+        
+        ArrayList<Double> outliers = new ArrayList<>();
+        outliers.add(2.0);
+        BoxAndWhiskerItem i11 = new BoxAndWhiskerItem(1.0, 2.0, 3.0, 4.0,
+                5.0, 6.0, 7.0, 8.0, outliers);
+        assertNotEquals(i1, i11);
     }
 
     /**

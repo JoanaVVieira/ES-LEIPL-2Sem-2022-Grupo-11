@@ -34,7 +34,6 @@ module org.jfree.chart {
     exports org.jfree.data.gantt;
     exports org.jfree.data.general;
     exports org.jfree.data.io;
-    exports org.jfree.data.json;
     exports org.jfree.data.statistics;
     exports org.jfree.data.time;
     exports org.jfree.data.time.ohlc;
