@@ -61,7 +61,7 @@ import org.jfree.data.xy.IntervalXYDataset;
 public class HistogramDataset extends AbstractIntervalXYDataset
         implements IntervalXYDataset, Cloneable, PublicCloneable,
                    Serializable {
-
+	/** HistogramDatasetProduct object */
     private HistogramDatasetProduct histogramDatasetProduct = new HistogramDatasetProduct();
 
 	/** For serialization. */

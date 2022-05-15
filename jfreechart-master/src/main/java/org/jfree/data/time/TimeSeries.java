@@ -520,8 +520,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds a data item to the series and sends a {@link SeriesChangeEvent} to
-     * all registered listeners.
+     * Adds a data item to the series.
      *
      * @param item  the (timeperiod, value) pair ({@code null} not permitted).
      */
@@ -530,8 +529,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds a data item to the series and sends a {@link SeriesChangeEvent} to
-     * all registered listeners.
+     * Adds a data item to the series.
      *
      * @param item  the (timeperiod, value) pair ({@code null} not permitted).
      * @param notify  notify listeners?
@@ -609,8 +607,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
 
 
     /**
-     * Adds a new data item to the series and sends a {@link SeriesChangeEvent}
-     * to all registered listeners.
+     * Adds a new data item to the series.
      *
      * @param period  the time period ({@code null} not permitted).
      * @param value  the value.
@@ -621,8 +618,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds a new data item to the series and sends a {@link SeriesChangeEvent}
-     * to all registered listeners.
+     * Adds a new data item to the series.
      *
      * @param period  the time period ({@code null} not permitted).
      * @param value  the value.
@@ -635,9 +631,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds a new data item to the series and sends
-     * a {@link org.jfree.data.general.SeriesChangeEvent} to all registered
-     * listeners.
+     * Adds a new data item to the series.
      *
      * @param period  the time period ({@code null} not permitted).
      * @param value  the value ({@code null} permitted).
@@ -648,8 +642,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds a new data item to the series and sends a {@link SeriesChangeEvent}
-     * to all registered listeners.
+     * Adds a new data item to the series.
      *
      * @param period  the time period ({@code null} not permitted).
      * @param value  the value ({@code null} permitted).
@@ -736,8 +729,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds or updates an item in the times series and sends a
-     * {@link SeriesChangeEvent} to all registered listeners.
+     * Adds or updates an item in the times series.
      *
      * @param period  the time period to add/update ({@code null} not
      *                permitted).
@@ -752,8 +744,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds or updates an item in the times series and sends a
-     * {@link SeriesChangeEvent} to all registered listeners.
+     * Adds or updates an item in the times series.
      *
      * @param period  the time period to add/update ({@code null} not
      *                permitted).
@@ -768,8 +759,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Adds or updates an item in the times series and sends a
-     * {@link SeriesChangeEvent} to all registered listeners.
+     * Adds or updates an item in the times series.
      *
      * @param item  the data item ({@code null} not permitted).
      *
@@ -844,7 +834,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
      * the oldest record in the series does not exceed maximumItemAge time
      * periods.  Oldest items will be removed if required.
      *
-     * @param notify  controls whether or not a {@link SeriesChangeEvent} is
+     * @param notify  controls whether or not a SeriesChangeEvent is
      *                sent to registered listeners IF any items are removed.
      */
     public void removeAgedItems(boolean notify) {
@@ -874,7 +864,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
      *
      * @param latest  the time to be compared against when aging data
      *     (specified in milliseconds).
-     * @param notify  controls whether or not a {@link SeriesChangeEvent} is
+     * @param notify  controls whether or not a SeriesChangeEvent is
      *                sent to registered listeners IF any items are removed.
      */
     public void removeAgedItems(long latest, boolean notify) {
@@ -919,8 +909,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
     }
 
     /**
-     * Removes all data items from the series and sends a
-     * {@link SeriesChangeEvent} to all registered listeners.
+     * Removes all data items from the series.
      */
     public void clear() {
         if (this.data.size() > 0) {
@@ -934,7 +923,7 @@ public class TimeSeries<S extends Comparable<S>> extends Series<S>
 
     /**
      * Deletes the data item for the given time period and sends a
-     * {@link SeriesChangeEvent} to all registered listeners.  If there is no
+     * SeriesChangeEvent to all registered listeners.  If there is no
      * item with the specified time period, this method does nothing.
      *
      * @param period  the period of the item to delete ({@code null} not
