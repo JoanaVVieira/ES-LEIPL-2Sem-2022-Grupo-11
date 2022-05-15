@@ -3,12 +3,19 @@ package org.jfree.data.statistics;
 
 import java.io.Serializable;
 
+/**
+ * HistogramDataset auxiliar class.
+ *
+ * @see HistogramDataset
+ */
+
 public class HistogramDatasetProduct implements Serializable, Cloneable {
 	/**
-	* Adds a series to the dataset, using the specified number of bins, and sends a  {@link DatasetChangeEvent}  to all registered listeners.
+	* Adds a series to the dataset, using the specified number of bins.
 	* @param key   the series key ( {@code  null}  not permitted).
 	* @param values  the values ( {@code  null}  not permitted).
 	* @param bins   the number of bins (must be at least 1).
+	* @param histogramDataset 	HistogramDataset object to add series.
 	*/
 	public void addSeries(Comparable key, double[] values, int bins, HistogramDataset histogramDataset) {
 		double minimum = getMinimum(values);

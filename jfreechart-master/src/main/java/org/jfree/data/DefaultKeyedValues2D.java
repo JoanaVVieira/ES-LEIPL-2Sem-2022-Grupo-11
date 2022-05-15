@@ -557,7 +557,7 @@ public class DefaultKeyedValues2D<R extends Comparable<R>, C extends Comparable<
 	 * Returns the value for a given chip x and y or null.
 	 * @param chipx   the x-index.
 	 * @param chipy   the y-index.
-	 * @param data
+	 * @param data	DefaultKeyedValues2D object
 	 * @return  The data value.
 	 */
 	public Number getChipValue(Comparable chipx, Comparable chipy, DefaultKeyedValues2D data) {
